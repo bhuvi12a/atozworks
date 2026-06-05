@@ -70,7 +70,9 @@ export default function AdminPanel() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const auth = sessionStorage.getItem("atozworks_admin_auth");
-      setIsAuthenticated(auth === "true");
+      setTimeout(() => {
+        setIsAuthenticated(auth === "true");
+      }, 0);
     }
   }, []);
 
