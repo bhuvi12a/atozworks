@@ -98,18 +98,26 @@ export default function Home() {
           <TiltCard className="md:col-span-2 md:row-span-2 bg-gradient-to-br from-[#82cdff] to-[#0077ff] rounded-[2rem] p-8 md:p-12 flex flex-col justify-between text-white shadow-[0_20px_60px_-15px_rgba(130,200,255,0.4)] relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
             <div>
-              <motion.span 
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold mb-6 border border-white/20 text-white"
-              >
-                HOSUR’S #1 HOME SERVICES
-              </motion.span>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <motion.span 
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                  className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold border border-white/20 text-white"
+                >
+                  HOSUR’S #1 HOME SERVICES
+                </motion.span>
+                <motion.a 
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                  href="tel:+919360651833"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/25 hover:bg-white/35 backdrop-blur-md rounded-full text-xs font-bold border border-white/30 text-white transition-all shadow-sm hover:scale-105"
+                >
+                  <Phone size={12} className="animate-pulse text-blue-100" /> Call +91 93606 51833
+                </motion.a>
+              </div>
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-4"
               >
-                Complete Home Services at Your Doorstep. <br className="hidden sm:inline" />
-                Call <a href="tel:+919360651833" className="hover:text-blue-100 transition-colors underline decoration-white/40 decoration-wavy underline-offset-8">+91 93606 51833</a>
+                Complete Home Services at Your Doorstep.
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
