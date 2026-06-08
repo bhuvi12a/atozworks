@@ -473,3 +473,46 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹1999"
   }
 ];
+
+export function getServiceKeyword(name: string): string {
+  const lowerName = name.toLowerCase();
+  if (
+    lowerName.endsWith("work") || 
+    lowerName.endsWith("works") || 
+    lowerName.endsWith("service") || 
+    lowerName.endsWith("services") || 
+    lowerName.endsWith("mechanic") || 
+    lowerName.endsWith("broker") || 
+    lowerName.endsWith("mediator") || 
+    lowerName.endsWith("department") ||
+    lowerName.includes("design") ||
+    lowerName.includes("shoot") ||
+    lowerName.includes("singers") ||
+    lowerName.includes("welcome") ||
+    lowerName.includes("beautician")
+  ) {
+    return `${name} in Hosur`;
+  }
+  if (
+    lowerName.includes("delivery") || 
+    lowerName.includes("washing") || 
+    lowerName.includes("booking") || 
+    lowerName.includes("rental") || 
+    lowerName.includes("control") || 
+    lowerName.includes("program") ||
+    lowerName.includes("dj") ||
+    lowerName.includes("drums")
+  ) {
+    return `${name} services in Hosur`;
+  }
+  if (lowerName === "vegetables") {
+    return "Vegetable supply in Hosur";
+  }
+  if (lowerName === "grocery items") {
+    return "Grocery supply in Hosur";
+  }
+  if (lowerName === "dress") {
+    return "Dress rentals in Hosur";
+  }
+  return `${name} works in Hosur`;
+}

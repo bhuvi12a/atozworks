@@ -11,7 +11,7 @@ import {
   Home as HomeIcon, Heart, Store, Flower2, ChefHat, Leaf, ShoppingCart,
   Music, Shirt, Smile, Sliders, Activity, Mic, Package, Award, Phone
 } from "lucide-react";
-import { ALL_SERVICES, CATEGORIES } from "./services-config";
+import { ALL_SERVICES, CATEGORIES, getServiceKeyword } from "./services-config";
 
 // CUSTOM 3D TILT COMPONENT
 const TiltCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
@@ -108,7 +108,8 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-4"
               >
-                Complete Home Services at Your Doorstep.
+                Complete Home Services at Your Doorstep. <br className="hidden sm:inline" />
+                Call <a href="tel:+919360651833" className="hover:text-blue-100 transition-colors underline decoration-white/40 decoration-wavy underline-offset-8">+91 93606 51833</a>
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
@@ -485,6 +486,28 @@ export default function Home() {
             >
               Register as Partner <ArrowRight size={16} />
             </Link>
+          </div>
+        </section>
+
+        {/* POPULAR SERVICES IN HOSUR (SEO LINKS) */}
+        <section className="mb-12 bg-white/40 backdrop-blur-sm border border-[#82cdff]/15 rounded-[2rem] p-8 md:p-10 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#0088ff]" />
+            Popular Service Locations & Searches in Hosur
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs font-semibold text-slate-500">
+            {[...ALL_SERVICES]
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((service) => (
+                <Link 
+                  key={service.slug} 
+                  href={`/services/${service.slug}`} 
+                  className="hover:text-[#0088ff] transition-all bg-white px-4 py-3 rounded-xl border border-slate-100 shadow-sm flex items-center gap-2"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#82cdff] flex-shrink-0" />
+                  <span className="truncate">{getServiceKeyword(service.name)}</span>
+                </Link>
+              ))}
           </div>
         </section>
 
