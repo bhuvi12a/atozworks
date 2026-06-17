@@ -338,7 +338,7 @@ export default function ServicePage({
 
     // 1. Attempt to sync with PostgreSQL backend database
     try {
-      await fetch("http://localhost:5000/api/v1/bookings", {
+      await fetch("/_/backend/api/v1/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -31,7 +31,7 @@ export default function BookingsDashboard() {
 
     // 1. Fetch bookings from backend if online
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/bookings?phone=${activeSearch}`);
+      const response = await fetch(`/_/backend/api/v1/bookings?phone=${activeSearch}`);
       if (response.ok) {
         const data = await response.json();
         if (data.bookings) {
@@ -91,7 +91,7 @@ export default function BookingsDashboard() {
 
     // 1. Attempt to update backend status to CANCELLED
     try {
-      await fetch(`http://localhost:5000/api/v1/bookings/${id}/status`, {
+      await fetch(`/_/backend/api/v1/bookings/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "CANCELLED" })

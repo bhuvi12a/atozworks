@@ -117,14 +117,14 @@ export default function AdminPanel() {
   const handleVerifyKyc = async (id: string, approve: boolean) => {
     const status = approve ? "APPROVED" : "REJECTED";
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/admin/kyc/${id}`, {
+      const response = await fetch(`/_/backend/api/v1/admin/kyc/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
       });
       if (response.ok) {
         // Refresh dynamically from DB
-        const providersRes = await fetch("http://localhost:5000/api/v1/admin/providers");
+        const providersRes = await fetch("/_/backend/api/v1/admin/providers");
         if (providersRes.ok) {
           const providersData = await providersRes.json();
           const dbKyc = providersData.providers
@@ -142,7 +142,7 @@ export default function AdminPanel() {
           setKycList(dbKyc);
           
           // Also reload users list to show approved role details
-          const usersRes = await fetch("http://localhost:5000/api/v1/admin/users");
+          const usersRes = await fetch("/_/backend/api/v1/admin/users");
           if (usersRes.ok) {
             const usersData = await usersRes.json();
             const dbUsers = usersData.users.map((u: any) => {
@@ -200,7 +200,7 @@ export default function AdminPanel() {
     const targetStatus = userToToggle.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
 
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/admin/users/${id}/status`, {
+      const response = await fetch(`/_/backend/api/v1/admin/users/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: targetStatus })
@@ -208,8 +208,8 @@ export default function AdminPanel() {
       if (response.ok) {
         // Refresh lists from database
         const [usersRes, providersRes] = await Promise.all([
-          fetch("http://localhost:5000/api/v1/admin/users"),
-          fetch("http://localhost:5000/api/v1/admin/providers")
+          fetch("/_/backend/api/v1/admin/users"),
+          fetch("/_/backend/api/v1/admin/providers")
         ]);
 
         if (usersRes.ok && providersRes.ok) {
@@ -266,7 +266,7 @@ export default function AdminPanel() {
   const handleUpdateBookingStatus = async (id: string, newStatus: string) => {
     // 1. Attempt to patch the database backend
     try {
-      await fetch(`http://localhost:5000/api/v1/bookings/${id}/status`, {
+      await fetch(`/_/backend/api/v1/bookings/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus })
@@ -299,7 +299,7 @@ export default function AdminPanel() {
     const syncData = async () => {
       // Load Bookings
       try {
-        const response = await fetch("http://localhost:5000/api/v1/bookings");
+        const response = await fetch("/_/backend/api/v1/bookings");
         if (response.ok) {
           const data = await response.json();
           if (data.bookings && data.bookings.length > 0) {
@@ -323,8 +323,8 @@ export default function AdminPanel() {
     const fetchDatabaseUsersAndProviders = async () => {
       try {
         const [usersRes, providersRes] = await Promise.all([
-          fetch("http://localhost:5000/api/v1/admin/users"),
-          fetch("http://localhost:5000/api/v1/admin/providers")
+          fetch("/_/backend/api/v1/admin/users"),
+          fetch("/_/backend/api/v1/admin/providers")
         ]);
 
         if (usersRes.ok && providersRes.ok) {
