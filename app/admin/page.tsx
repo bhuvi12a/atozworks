@@ -286,9 +286,8 @@ export default function AdminPanel() {
     const localBookingsStr = localStorage.getItem("atozworks_bookings");
     if (localBookingsStr) {
       const localBookings = JSON.parse(localBookingsStr);
-      const merged = [...localBookings, ...MOCK_BOOKINGS];
       // prevent duplicate booking numbers
-      const unique = merged.filter((v, i, a) => a.findIndex(t => t.bookingNumber === v.bookingNumber) === i);
+      const unique = localBookings.filter((v: any, i: number, a: any[]) => a.findIndex(t => t.bookingNumber === v.bookingNumber) === i);
       setBookingList(unique);
     }
   }, []);
@@ -297,9 +296,8 @@ export default function AdminPanel() {
     const localUsersStr = localStorage.getItem("atozworks_users");
     if (localUsersStr) {
       const localUsers = JSON.parse(localUsersStr);
-      const merged = [...MOCK_USERS, ...localUsers];
-      // prevent duplicate user IDs
-      const unique = merged.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+      // prevent duplicates based on phone
+      const unique = localUsers.filter((v: any, i: number, a: any[]) => a.findIndex(t => t.phone === v.phone) === i);
       setUserList(unique);
     }
   }, []);
@@ -308,9 +306,8 @@ export default function AdminPanel() {
     const localKycStr = localStorage.getItem("atozworks_kyc");
     if (localKycStr) {
       const localKyc = JSON.parse(localKycStr);
-      const merged = [...MOCK_KYC, ...localKyc];
       // prevent duplicate KYC IDs
-      const unique = merged.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+      const unique = localKyc.filter((v: any, i: number, a: any[]) => a.findIndex(t => t.id === v.id) === i);
       setKycList(unique);
     }
   }, []);
