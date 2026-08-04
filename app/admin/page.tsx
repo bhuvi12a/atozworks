@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -27,36 +27,22 @@ const MOCK_ANALYTICS = {
   ]
 };
 
-const MOCK_KYC = [
-  { id: "p1", name: "Ramesh Kumar", service: "Plumbing", experience: 6, docUrl: "Aadhaar_Card.pdf", phone: "9876543201" },
-  { id: "p2", name: "Sunil Verma", service: "AC Repair", experience: 4, docUrl: "Pan_Card.pdf", phone: "9876543202" },
-  { id: "p3", name: "Amit Sharma", service: "Carpentry", experience: 8, docUrl: "Driving_License.pdf", phone: "9876543203" }
-];
-
-const MOCK_USERS = [
-  { id: "u1", name: "John Doe", email: "john@example.com", phone: "9876543210", role: "CUSTOMER", status: "ACTIVE" },
-  { id: "u2", name: "Robert Electrician", email: "robert@example.com", phone: "7777777777", role: "PROVIDER", status: "ACTIVE" },
-  { id: "u3", name: "David Cleaner", email: "david@example.com", phone: "6666666666", role: "PROVIDER", status: "ACTIVE" },
-  { id: "u4", name: "Alice Brown", email: "alice@example.com", phone: "9876543211", role: "CUSTOMER", status: "SUSPENDED" }
-];
-
-const MOCK_BOOKINGS = [
-  { id: "b1", bookingNumber: "AW-20260604-8742", customer: "John Doe", service: "AC Repair", provider: "Ramesh Kumar", date: "2026-06-05", price: "₹299", status: "PROVIDER_ASSIGNED", lat: 12.7420, lng: 77.8280, phone: "9876543210", email: "john@example.com", address: "No. 42, Green Glen Layout, Hosur - 635109" },
-  { id: "b2", bookingNumber: "AW-20260604-3291", customer: "Alice Brown", service: "Home Cleaning", provider: "David Cleaner", date: "2026-06-06", price: "₹499", status: "IN_PROGRESS", lat: 12.7480, lng: 77.8320, phone: "9876543211", email: "alice@example.com", address: "Plot 12, SIPCOT Area, Hosur - 635126" },
-  { id: "b3", bookingNumber: "AW-20260604-1049", customer: "John Doe", service: "Plumbing", provider: "Sunil Verma", date: "2026-06-04", price: "₹199", status: "COMPLETED", lat: 12.7380, lng: 77.8180, phone: "9876543210", email: "john@example.com", address: "No. 42, Green Glen Layout, Hosur - 635109" },
-  { id: "b4", bookingNumber: "AW-20260604-9812", customer: "Jane Smith", service: "Electrical", provider: "Robert Electrician", date: "2026-06-07", price: "₹149", status: "PENDING", lat: 12.7550, lng: 77.8420, phone: "9876543212", email: "jane@example.com", address: "No. 5, NGO Colony, Hosur - 635109" }
-];
-
-
+// Removed MOCK data for production
+// Admin panel credentials — must match ADMIN_SECRET in backend/.env
+const ADMIN_PASSWORD = "AtoZWorks@Admin2026!";
+const ADMIN_HEADERS = {
+  "Content-Type": "application/json",
+  "X-Admin-Password": ADMIN_PASSWORD,
+};
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "kyc" | "users" | "bookings">("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
   
   // Dynamic State management for UI interactions
-  const [kycList, setKycList] = useState<any[]>(MOCK_KYC);
-  const [userList, setUserList] = useState<any[]>(MOCK_USERS);
-  const [bookingList, setBookingList] = useState<any[]>(MOCK_BOOKINGS);
+  const [kycList, setKycList] = useState<any[]>([]);
+  const [userList, setUserList] = useState<any[]>([]);
+  const [bookingList, setBookingList] = useState<any[]>([]);
   const [activeMapBooking, setActiveMapBooking] = useState<any | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<any | null>(null);
 
@@ -90,8 +76,7 @@ export default function AdminPanel() {
     setAuthError("");
     try {
       const hashed = await hashPassword(password);
-      // c66c75f960f598f862daf49a4b79596267cdc1c9c54a5a053d7f6fd7858d630e is SHA-256 for AtoZWorks@Admin2026!
-      if (hashed === "c66c75f960f598f862daf49a4b79596267cdc1c9c54a5a053d7f6fd7858d630e") {
+      if (password === "AtoZWorks@Admin2026!" || hashed === "c66c75f960f598f862daf49a4b79596267cdc1c9c54a5a053d7f6fd7858d630e") {
         sessionStorage.setItem("atozworks_admin_auth", "true");
         setIsAuthenticated(true);
       } else {
@@ -119,12 +104,14 @@ export default function AdminPanel() {
     try {
       const response = await fetch(`/_/backend/api/v1/admin/kyc/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: ADMIN_HEADERS,
         body: JSON.stringify({ status })
       });
       if (response.ok) {
         // Refresh dynamically from DB
-        const providersRes = await fetch("/_/backend/api/v1/admin/providers");
+        const providersRes = await fetch("/_/backend/api/v1/admin/providers", {
+          headers: ADMIN_HEADERS
+        });
         if (providersRes.ok) {
           const providersData = await providersRes.json();
           const dbKyc = providersData.providers
@@ -142,7 +129,9 @@ export default function AdminPanel() {
           setKycList(dbKyc);
           
           // Also reload users list to show approved role details
-          const usersRes = await fetch("/_/backend/api/v1/admin/users");
+          const usersRes = await fetch("/_/backend/api/v1/admin/users", {
+            headers: ADMIN_HEADERS
+          });
           if (usersRes.ok) {
             const usersData = await usersRes.json();
             const dbUsers = usersData.users.map((u: any) => {
@@ -202,14 +191,14 @@ export default function AdminPanel() {
     try {
       const response = await fetch(`/_/backend/api/v1/admin/users/${id}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: ADMIN_HEADERS,
         body: JSON.stringify({ status: targetStatus })
       });
       if (response.ok) {
         // Refresh lists from database
         const [usersRes, providersRes] = await Promise.all([
-          fetch("/_/backend/api/v1/admin/users"),
-          fetch("/_/backend/api/v1/admin/providers")
+          fetch("/_/backend/api/v1/admin/users", { headers: ADMIN_HEADERS }),
+          fetch("/_/backend/api/v1/admin/providers", { headers: ADMIN_HEADERS })
         ]);
 
         if (usersRes.ok && providersRes.ok) {
@@ -268,7 +257,7 @@ export default function AdminPanel() {
     try {
       await fetch(`/_/backend/api/v1/bookings/${id}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: ADMIN_HEADERS,
         body: JSON.stringify({ status: newStatus })
       });
     } catch (e) {
@@ -293,13 +282,105 @@ export default function AdminPanel() {
     }
   };
 
-  // Load bookings and coupons on mount from database or local storage
+  const loadLocalBookings = useCallback(() => {
+    const localBookingsStr = localStorage.getItem("atozworks_bookings");
+    if (localBookingsStr) {
+      const localBookings = JSON.parse(localBookingsStr);
+      const merged = [...localBookings, ...MOCK_BOOKINGS];
+      // prevent duplicate booking numbers
+      const unique = merged.filter((v, i, a) => a.findIndex(t => t.bookingNumber === v.bookingNumber) === i);
+      setBookingList(unique);
+    }
+  }, []);
+
+  const loadLocalUsers = useCallback(() => {
+    const localUsersStr = localStorage.getItem("atozworks_users");
+    if (localUsersStr) {
+      const localUsers = JSON.parse(localUsersStr);
+      const merged = [...MOCK_USERS, ...localUsers];
+      // prevent duplicate user IDs
+      const unique = merged.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+      setUserList(unique);
+    }
+  }, []);
+
+  const loadLocalKyc = useCallback(() => {
+    const localKycStr = localStorage.getItem("atozworks_kyc");
+    if (localKycStr) {
+      const localKyc = JSON.parse(localKycStr);
+      const merged = [...MOCK_KYC, ...localKyc];
+      // prevent duplicate KYC IDs
+      const unique = merged.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+      setKycList(unique);
+    }
+  }, []);
+
+  const fetchDatabaseUsersAndProviders = useCallback(async () => {
+    try {
+      const [usersRes, providersRes] = await Promise.all([
+        fetch("/_/backend/api/v1/admin/users", { headers: ADMIN_HEADERS }),
+        fetch("/_/backend/api/v1/admin/providers", { headers: ADMIN_HEADERS })
+      ]);
+
+      if (usersRes.ok && providersRes.ok) {
+        const usersData = await usersRes.json();
+        const providersData = await providersRes.json();
+
+        if (usersData.users && providersData.providers) {
+          // Format KYC list items (Pending providers)
+          const dbKyc = providersData.providers
+            .filter((p: any) => p.kycStatus === "PENDING")
+            .map((p: any) => ({
+              id: p._id,
+              name: p.userId?.name || "Unknown Provider",
+              service: p.categories?.map((c: any) => c.name).join(", ") || "General",
+              experience: p.experience,
+              docUrl: "Aadhaar_Card.pdf",
+              phone: p.userId?.phone || "",
+              selfie: p.selfie,
+              idCard: p.idCard
+            }));
+          setKycList(dbKyc);
+
+          // Format users and merge providers photos
+          const dbUsers = usersData.users.map((u: any) => {
+            const pInfo = providersData.providers.find((p: any) => p.userId?._id === u._id);
+            return {
+              id: u._id,
+              name: u.name,
+              email: u.email,
+              phone: u.phone,
+              role: u.role,
+              status: u.status,
+              selfie: pInfo?.selfie,
+              idCard: pInfo?.idCard,
+              experience: pInfo?.experience,
+              service: pInfo?.categories?.map((c: any) => c.name).join(", ")
+            };
+          });
+          setUserList(dbUsers);
+          return;
+        }
+      }
+      
+      loadLocalUsers();
+      loadLocalKyc();
+    } catch (err) {
+      console.warn("Backend admin endpoints not reachable. Falling back to local storage.");
+      loadLocalUsers();
+      loadLocalKyc();
+    }
+  }, [loadLocalUsers, loadLocalKyc]);
+
+  // Load bookings and coupons on mount with live 5-second auto-polling
   useEffect(() => {
     if (isAuthenticated !== true) return;
     const syncData = async () => {
       // Load Bookings
       try {
-        const response = await fetch("/_/backend/api/v1/bookings");
+        const response = await fetch("/_/backend/api/v1/bookings", {
+          headers: ADMIN_HEADERS
+        });
         if (response.ok) {
           const data = await response.json();
           if (data.bookings && data.bookings.length > 0) {
@@ -314,106 +395,14 @@ export default function AdminPanel() {
         loadLocalBookings();
       }
 
-
-
       // Load custom users & KYC requests
       await fetchDatabaseUsersAndProviders();
     };
 
-    const fetchDatabaseUsersAndProviders = async () => {
-      try {
-        const [usersRes, providersRes] = await Promise.all([
-          fetch("/_/backend/api/v1/admin/users"),
-          fetch("/_/backend/api/v1/admin/providers")
-        ]);
-
-        if (usersRes.ok && providersRes.ok) {
-          const usersData = await usersRes.json();
-          const providersData = await providersRes.json();
-
-          if (usersData.users && providersData.providers) {
-            // Format KYC list items (Pending providers)
-            const dbKyc = providersData.providers
-              .filter((p: any) => p.kycStatus === "PENDING")
-              .map((p: any) => ({
-                id: p._id,
-                name: p.userId?.name || "Unknown Provider",
-                service: p.categories?.map((c: any) => c.name).join(", ") || "General",
-                experience: p.experience,
-                docUrl: "Aadhaar_Card.pdf",
-                phone: p.userId?.phone || "",
-                selfie: p.selfie,
-                idCard: p.idCard
-              }));
-            setKycList(dbKyc);
-
-            // Format users and merge providers photos
-            const dbUsers = usersData.users.map((u: any) => {
-              const pInfo = providersData.providers.find((p: any) => p.userId?._id === u._id);
-              return {
-                id: u._id,
-                name: u.name,
-                email: u.email,
-                phone: u.phone,
-                role: u.role,
-                status: u.status,
-                selfie: pInfo?.selfie,
-                idCard: pInfo?.idCard,
-                experience: pInfo?.experience,
-                service: pInfo?.categories?.map((c: any) => c.name).join(", ")
-              };
-            });
-            setUserList(dbUsers);
-            return;
-          }
-        }
-        
-        loadLocalUsers();
-        loadLocalKyc();
-      } catch (err) {
-        console.warn("Backend admin endpoints not reachable. Falling back to local storage.");
-        loadLocalUsers();
-        loadLocalKyc();
-      }
-    };
-
-    const loadLocalBookings = () => {
-      const localBookingsStr = localStorage.getItem("atozworks_bookings");
-      if (localBookingsStr) {
-        const localBookings = JSON.parse(localBookingsStr);
-        const merged = [...localBookings, ...MOCK_BOOKINGS];
-        // prevent duplicate booking numbers
-        const unique = merged.filter((v, i, a) => a.findIndex(t => t.bookingNumber === v.bookingNumber) === i);
-        setBookingList(unique);
-      }
-    };
-
-
-
-    const loadLocalUsers = () => {
-      const localUsersStr = localStorage.getItem("atozworks_users");
-      if (localUsersStr) {
-        const localUsers = JSON.parse(localUsersStr);
-        const merged = [...MOCK_USERS, ...localUsers];
-        // prevent duplicate user IDs
-        const unique = merged.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-        setUserList(unique);
-      }
-    };
-
-    const loadLocalKyc = () => {
-      const localKycStr = localStorage.getItem("atozworks_kyc");
-      if (localKycStr) {
-        const localKyc = JSON.parse(localKycStr);
-        const merged = [...MOCK_KYC, ...localKyc];
-        // prevent duplicate KYC IDs
-        const unique = merged.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-        setKycList(unique);
-      }
-    };
-
     syncData();
-  }, [isAuthenticated]);
+    const interval = setInterval(syncData, 5000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, loadLocalBookings, fetchDatabaseUsersAndProviders]);
 
 
 

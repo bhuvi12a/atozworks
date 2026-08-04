@@ -1,4 +1,5 @@
 import { Response, NextFunction } from "express";
+import { UserModel } from "../models/User";
 import { AddressModel } from "../models/Address";
 import { NotificationModel } from "../models/Notification";
 import { AuthenticatedRequest } from "../middlewares/auth";
@@ -193,6 +194,100 @@ export class UserController {
       res.status(200).json({
         success: true,
         message: "Notification marked as read.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Get the current authenticated user's profile.
+   * GET /api/v1/users/profile
+   */
+  public static async getProfile(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return next(new AppError("Unauthorized", 401));
+
+      const user = await UserModel.findById(userId).select("-passwordHash");
+
+      if (!user) return next(new AppError("User not found.", 404));
+
+      res.status(200).json({
+        success: true,
+        user: {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          status: user.status,
+          createdAt: user.createdAt,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Update the current user's profile (name, email).
+   * PATCH /api/v1/users/profile
+   */
+  public static async updateProfile(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return next(new AppError("Unauthorized", 401));
+
+      const { name, email } = req.body;
+
+      // Build update payload (only allowed fields)
+      const updateData: Record<string, string> = {};
+      if (name && name.trim()) updateData.name = name.trim();
+      if (email && email.trim()) updateData.email = email.toLowerCase().trim();
+
+      if (Object.keys(updateData).length === 0) {
+        return next(new AppError("Please provide at least one field to update.", 400));
+      }
+
+      // Check email uniqueness if changing email
+      if (updateData.email) {
+        const existing = await UserModel.findOne({
+          email: updateData.email,
+          _id: { $ne: userId },
+        });
+        if (existing) {
+          return next(new AppError("This email is already taken by another account.", 400));
+        }
+      }
+
+      const user = await UserModel.findByIdAndUpdate(
+        userId,
+        updateData,
+        { new: true }
+      ).select("-passwordHash");
+
+      if (!user) return next(new AppError("User not found.", 404));
+
+      res.status(200).json({
+        success: true,
+        message: "Profile updated successfully.",
+        user: {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          status: user.status,
+        },
       });
     } catch (error) {
       next(error);

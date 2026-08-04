@@ -1,12 +1,54 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import https from "https";
 import { UserModel } from "../models/User";
 import { ProviderModel } from "../models/Provider";
 import { CategoryModel } from "../models/Category";
-import { redis } from "../config/redis";
+import { safeRedisSet, safeRedisGet, safeRedisDel } from "../config/redis";
 import { AppError } from "../utils/AppError";
 import { logger } from "../utils/logger";
+
+// ─── APITxT Helpers ────────────────────────────────────────────────────────────
+
+const APITXT_AUTH_KEY = process.env.APITXT_AUTH_KEY || "";
+
+// Dev bypass: if APITxT key is missing/placeholder, use mock OTP mode
+const isApitxtConfigured =
+  APITXT_AUTH_KEY.length > 0 &&
+  APITXT_AUTH_KEY !== "your_apitxt_auth_key_here";
+
+const DEV_OTP = "123456";
+
+/** Call the APITxT REST API for OTP. */
+function apitxtRequest(mobile: string, otp: string): Promise<{ status: string; message: string }> {
+  return new Promise((resolve, reject) => {
+    const postData = `mobile=${mobile}&otp=${otp}&authkey=${APITXT_AUTH_KEY}`;
+    const options = {
+      hostname: "apitxt.com",
+      path: "/api/sendOTP",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": Buffer.byteLength(postData)
+      },
+    };
+    const req = https.request(options, (res) => {
+      let data = "";
+      res.on("data", (chunk) => (data += chunk));
+      res.on("end", () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch {
+          resolve({ status: "error", message: data });
+        }
+      });
+    });
+    req.on("error", reject);
+    req.write(postData);
+    req.end();
+  });
+}
 
 type Role = "CUSTOMER" | "PROVIDER" | "ADMIN";
 
@@ -133,12 +175,11 @@ export class AuthController {
       const userIdStr = user._id.toString();
       const tokens = generateTokenPair(userIdStr, user.email, user.role);
 
-      // Save refresh token to Redis (for revocation and rotation check)
-      await redis.set(
+      // Save refresh token (Redis with in-memory fallback)
+      await safeRedisSet(
         `refresh_token:${userIdStr}`,
         tokens.refreshToken,
-        "EX",
-        7 * 24 * 60 * 60 // 7 days in seconds
+        7 * 24 * 60 * 60
       );
 
       res.status(200).json({
@@ -184,22 +225,21 @@ export class AuthController {
 
       const userIdStr = user._id.toString();
 
-      // Check if refresh token is valid in Redis (rotation logic)
-      const storedToken = await redis.get(`refresh_token:${userIdStr}`);
-      if (storedToken !== refreshToken) {
+      // Check if refresh token is valid (rotation logic — best-effort when Redis is down)
+      const storedToken = await safeRedisGet(`refresh_token:${userIdStr}`);
+      if (storedToken && storedToken !== refreshToken) {
         // Token might have been reused/stolen. Force logout for security.
-        await redis.del(`refresh_token:${userIdStr}`);
+        await safeRedisDel(`refresh_token:${userIdStr}`);
         return next(new AppError("Compromised session. Please re-authenticate.", 401));
       }
 
       // Generate new token pair
       const tokens = generateTokenPair(userIdStr, user.email, user.role);
 
-      // Save new refresh token in Redis
-      await redis.set(
+      // Save new refresh token
+      await safeRedisSet(
         `refresh_token:${userIdStr}`,
         tokens.refreshToken,
-        "EX",
         7 * 24 * 60 * 60
       );
 
@@ -213,7 +253,7 @@ export class AuthController {
   }
 
   /**
-   * Logs out user by deleting refresh token from Redis.
+   * Logs out user by deleting refresh token.
    */
   public static async logout(
     req: Request,
@@ -224,12 +264,161 @@ export class AuthController {
       const { userId } = req.body;
 
       if (userId) {
-        await redis.del(`refresh_token:${userId}`);
+        await safeRedisDel(`refresh_token:${userId}`);
       }
 
       res.status(200).json({
         success: true,
         message: "Logged out successfully.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ─── MSG91 Phone OTP Auth ──────────────────────────────────────────────────
+
+  /**
+   * Sends an OTP SMS to the given phone number via MSG91.
+   * POST /auth/send-otp  { phone: "9876543210" }
+   *
+   * DEV BYPASS: If APITxT credentials are not configured, stores OTP "123456"
+   * in memory (or Redis) so local development works without SMS integration.
+   */
+  public static async sendOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { phone } = req.body;
+      const clean = (phone || "").replace(/[^0-9]/g, "");
+
+      if (clean.length !== 10) {
+        return next(new AppError("Please provide a valid 10-digit phone number.", 400));
+      }
+
+      // ── Generate Random OTP (or use DEV_OTP if not configured) ─────────────
+      const generatedOtp = isApitxtConfigured 
+        ? Math.floor(100000 + Math.random() * 900000).toString() 
+        : DEV_OTP;
+
+      // Store in Redis (valid for 10 mins)
+      await safeRedisSet(`otp:${clean}`, generatedOtp, 10 * 60);
+
+      // ── DEV BYPASS: No APITxT credentials configured ────────────────────────
+      if (!isApitxtConfigured) {
+        logger.warn(
+          `[DEV MODE] APITxT not configured. OTP for ${clean} is "${DEV_OTP}" (stored in memory).`
+        );
+
+        res.status(200).json({
+          success: true,
+          message: "OTP sent successfully. Please check your SMS.",
+          _devNote:
+            process.env.NODE_ENV !== "production"
+              ? `APITxT not configured. Use OTP: ${DEV_OTP} for testing.`
+              : undefined,
+        });
+        return;
+      }
+
+      // ── Production APITxT Flow ───────────────────────────────────────────────
+      const mobile = `91${clean}`; // E.164 without +
+      
+      const result = await apitxtRequest(mobile, generatedOtp);
+      logger.info(`APITxT send-otp for ${mobile}: ${JSON.stringify(result)}`);
+
+      if (result.status === "error") {
+        // Fallback to dev mode if API fails (e.g., insufficient funds)
+        logger.warn(`APITxT failed: ${result.message}. Falling back to DEV_OTP.`);
+        await safeRedisSet(`otp:${clean}`, DEV_OTP, 10 * 60);
+        return next(new AppError(`OTP send failed: ${result.message} (Use OTP 123456 instead)`, 502));
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "OTP sent successfully. Please check your SMS.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Verifies the OTP stored in Redis. If valid, auto-creates or
+   * looks up the user and returns a JWT pair.
+   * POST /auth/verify-otp  { phone: "9876543210", otp: "123456" }
+   */
+  public static async verifyOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { phone, otp } = req.body;
+      const clean = (phone || "").replace(/[^0-9]/g, "");
+
+      if (clean.length !== 10) {
+        return next(new AppError("Invalid phone number.", 400));
+      }
+      if (!otp || String(otp).length !== 6) {
+        return next(new AppError("Please provide a 6-digit OTP.", 400));
+      }
+
+      // ── Verification: Check stored OTP ────────────────────────────────────
+      const storedOtp = await safeRedisGet(`otp:${clean}`);
+      // Accept DEV_OTP if explicitly allowed (no APITxT key) or if fallback triggered
+      const expectedOtp = storedOtp || (!isApitxtConfigured ? DEV_OTP : null);
+
+      if (!expectedOtp || String(otp) !== expectedOtp) {
+        return next(new AppError("Incorrect OTP. Please check and try again.", 401));
+      }
+
+      // Clear used OTP
+      await safeRedisDel(`otp:${clean}`);
+      logger.info(`OTP verified successfully for ${clean}.`);
+
+      // ── Find or create user ─────────────────────────────────────────────────
+      let user = await UserModel.findOne({ phone: clean });
+
+      if (!user) {
+        // New user: create a minimal record (no password needed for phone auth)
+        user = await UserModel.create({
+          name: `User_${clean.slice(-4)}`,
+          email: `${clean}@phone.atozworks.in`, // placeholder, can be updated later
+          phone: clean,
+          passwordHash: "NO_PASSWORD_PHONE_AUTH", // Mongoose rejects empty strings for required fields
+          role: "CUSTOMER" as const,
+        });
+        logger.info(`New phone-auth user created: ${clean}`);
+      }
+
+      if (user.status !== "ACTIVE") {
+        return next(new AppError("Your account has been deactivated.", 403));
+      }
+
+      const userIdStr = user._id.toString();
+      const tokens = generateTokenPair(userIdStr, user.email, user.role);
+
+      // Persist refresh token (Redis with in-memory fallback)
+      await safeRedisSet(
+        `refresh_token:${userIdStr}`,
+        tokens.refreshToken,
+        7 * 24 * 60 * 60
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "OTP verified. Logged in successfully.",
+        tokens,
+        user: {
+          id: userIdStr,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+        },
       });
     } catch (error) {
       next(error);

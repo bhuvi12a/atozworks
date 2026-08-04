@@ -67,7 +67,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹399"
   },
   {
-    name: "Flower Works",
+    name: "Floral Decoration Services",
     slug: "flower-works",
     desc: "Exquisite floral arrangements & garlands.",
     icon: Flower,
@@ -77,7 +77,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹299"
   },
   {
-    name: "Wood Works",
+    name: "Carpentry & Woodwork Solutions",
     slug: "wood-works",
     desc: "Cabinet repair, wooden shelves & carpentry.",
     icon: Hammer,
@@ -87,12 +87,12 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹399"
   },
   {
-    name: "TV Mechanic",
+    name: "TV & Display Repair",
     slug: "tv-mechanic",
     desc: "LED/LCD TV mounting, repair & setup.",
     icon: Tv,
     color: "from-indigo-400 to-indigo-600",
-    image: "/images/services/appliance.png",
+    image: "/images/services/tv_repair.png",
     category: CATEGORIES.HOME_MAINTENANCE,
     price: "₹199"
   },
@@ -149,42 +149,42 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹199"
   },
   {
-    name: "Bike Mechanic",
+    name: "Two-Wheeler Mechanic Services",
     slug: "bike-mechanic",
     desc: "Engine tuning, oil change & break diagnostics.",
     icon: Bike,
     color: "from-emerald-400 to-emerald-600",
-    image: "/images/services/appliance.png",
+    image: "/images/services/bike_mechanic.png",
     category: CATEGORIES.VEHICLES_PERSONAL,
     price: "₹199"
   },
   {
-    name: "Car Mechanic",
+    name: "Four-Wheeler Auto Services",
     slug: "car-mechanic",
     desc: "Brake service, engine tuning & dent fixing.",
     icon: Car,
     color: "from-blue-600 to-blue-800",
-    image: "/images/services/car_booking.png",
+    image: "/images/services/car_mechanic.png",
     category: CATEGORIES.VEHICLES_PERSONAL,
     price: "₹299"
   },
   {
-    name: "Bike Washing",
+    name: "Motorbike Foam Wash",
     slug: "bike-washing",
     desc: "High-pressure foam wash & chrome polishing.",
     icon: Droplets,
     color: "from-sky-500 to-sky-700",
-    image: "/images/services/plumbing.png",
+    image: "/images/services/bike_washing.png",
     category: CATEGORIES.VEHICLES_PERSONAL,
     price: "₹99"
   },
   {
-    name: "Car Washing",
+    name: "Car Foam Wash & Detailing",
     slug: "car-washing",
     desc: "Deep foam wash, interior vacuuming & dashboard polish.",
     icon: Droplets,
     color: "from-blue-500 to-cyan-600",
-    image: "/images/services/car_booking.png",
+    image: "/images/services/car_washing.png",
     category: CATEGORIES.VEHICLES_PERSONAL,
     price: "₹299"
   },
@@ -239,7 +239,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹999"
   },
   {
-    name: "Welding Works",
+    name: "Precision Metal & Gate Welding",
     slug: "welding-works",
     desc: "Metal gate, window grill & railing repairs.",
     icon: Flame,
@@ -301,7 +301,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹399"
   },
   {
-    name: "Govt. Document Broker",
+    name: "Government Documentation Assistance",
     slug: "govt-document-broker",
     desc: "Assistance with files, licenses & applications.",
     icon: FileText,
@@ -311,7 +311,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹199"
   },
   {
-    name: "Real Estate Mediator",
+    name: "Real Estate & Property Consultancy",
     slug: "real-estate-mediator",
     desc: "Plot, rental, and commercial properties search.",
     icon: HomeIcon,
@@ -331,7 +331,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹199"
   },
   {
-    name: "Marriage Works",
+    name: "Wedding & Event Management",
     slug: "marriage-works",
     desc: "Wedding stage decor & ceremony planning.",
     icon: Heart,
@@ -351,7 +351,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹1999"
   },
   {
-    name: "Flower Design",
+    name: "Custom Stage & Floral Design",
     slug: "flower-design",
     desc: "Exotic floral background and backdrop design.",
     icon: Flower2,
@@ -363,7 +363,7 @@ export const ALL_SERVICES: ServiceItem[] = [
 
   // COLUMN 4: Events & Supplies
   {
-    name: "Catering Department",
+    name: "Catering & Buffet Services",
     slug: "catering-department",
     desc: "Multi-cuisine buffet & plate service.",
     icon: ChefHat,
@@ -393,7 +393,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹299"
   },
   {
-    name: "Vegetables",
+    name: "Wholesale Fresh Vegetables Supply",
     slug: "vegetables-wholesale",
     desc: "Bulk vegetables supply for functions & hotels.",
     icon: Leaf,
@@ -403,7 +403,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹499"
   },
   {
-    name: "Grocery Items",
+    name: "Wholesale Grocery & Provisions",
     slug: "grocery-wholesale",
     desc: "Bulk grains, oil & pantry provisions.",
     icon: ShoppingCart,
@@ -413,7 +413,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹999"
   },
   {
-    name: "Drums",
+    name: "Traditional Drums & Band Troupe",
     slug: "drums",
     desc: "Traditional drums & band sets for events.",
     icon: Music,
@@ -423,7 +423,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹999"
   },
   {
-    name: "Dress",
+    name: "Bridal & Event Apparel Rentals",
     slug: "dress-rental",
     desc: "Wedding & ceremonial dress rentals.",
     icon: Shirt,
@@ -433,7 +433,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     price: "₹499"
   },
   {
-    name: "Welcome Givers",
+    name: "Event Guest Welcoming & Hospitality Staff",
     slug: "welcome-givers",
     desc: "Event hostess and greeter staff hire.",
     icon: Smile,

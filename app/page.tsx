@@ -574,6 +574,18 @@ export default function Home() {
             </div>
           </div>
 
+          {/* SEO Services Footer Links */}
+          <div className="border-t border-[#82cdff]/15 pt-8 mb-8">
+            <h4 className="font-bold text-xs uppercase tracking-wider text-slate-400 mb-4">All Home & Business Services in Hosur</h4>
+            <div className="flex flex-wrap gap-x-6 gap-y-2.5 text-xs text-slate-500 font-medium">
+              {ALL_SERVICES.map((s) => (
+                <Link key={s.slug} href={`/services/${s.slug}`} className="hover:text-[#0088ff] transition">
+                  {getServiceKeyword(s.name)}
+                </Link>
+              ))}
+            </div>
+          </div>
+
           <div className="border-t border-[#82cdff]/15 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
             <div>
               © {new Date().getFullYear()} AtoZ Works. All rights reserved.

@@ -49,8 +49,8 @@ const seedDatabase = async () => {
 
     await UserModel.create({
       name: "System Admin",
-      email: "admin@atozworks.com",
-      phone: "9999999999",
+      email: "admin@atozworks.in",
+      phone: "9360651833",
       passwordHash,
       role: "ADMIN",
       status: "ACTIVE",

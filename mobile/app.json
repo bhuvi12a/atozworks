@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "AtoZ Works",
+    "slug": "mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.atozworks.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#080818",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.atozworks.app",
+      "googleServicesFile": "./google-services.json",
+      "minSdkVersion": 24
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "af608a1f-bebf-490c-a6a0-09966ec3ebcc"
+      }
+    },
+    "owner": "bhuvi1210"
+  }
+}

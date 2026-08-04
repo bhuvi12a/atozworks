@@ -4,13 +4,17 @@ import { authenticate, restrictTo } from "../middlewares/auth";
 
 const router = Router();
 
-// Protect and restrict all endpoints in this router to service providers
+// All provider routes require authentication
 router.use(authenticate);
-router.use(restrictTo("PROVIDER"));
 
-router.post("/service-area", ProviderController.updateServiceArea);
-router.post("/availability", ProviderController.updateAvailability);
-router.get("/earnings", ProviderController.getEarnings);
-router.patch("/bookings/:bookingId/respond", ProviderController.respondToBooking);
+// ── Open to any authenticated user (allows a customer to register as provider) ──
+router.post("/register", ProviderController.registerProvider);
+router.get("/profile", ProviderController.getProviderProfile);
+
+// ── Restricted to established service providers ──────────────────────────────
+router.post("/service-area", restrictTo("PROVIDER"), ProviderController.updateServiceArea);
+router.post("/availability", restrictTo("PROVIDER"), ProviderController.updateAvailability);
+router.get("/earnings", restrictTo("PROVIDER"), ProviderController.getEarnings);
+router.patch("/bookings/:bookingId/respond", restrictTo("PROVIDER"), ProviderController.respondToBooking);
 
 export default router;

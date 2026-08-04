@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { AdminController } from "../controllers/adminController";
-import { authenticate, restrictTo } from "../middlewares/auth";
+import { adminAuth } from "../middlewares/adminAuth";
 
 const router = Router();
 
-// Restrict this entire route directory to Administrators
-router.use(authenticate);
-router.use(restrictTo("ADMIN"));
+// All admin routes are protected by password-based auth
+// (Frontend sends X-Admin-Password header; no JWT required)
+router.use(adminAuth);
 
 router.patch("/kyc/:providerId", AdminController.verifyKyc);
 router.get("/analytics", AdminController.getAnalytics);

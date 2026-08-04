@@ -1,7 +1,9 @@
 import { Response, NextFunction } from "express";
 import { ProviderModel } from "../models/Provider";
 import { BookingModel } from "../models/Booking";
-import { redis } from "../config/redis";
+import { UserModel } from "../models/User";
+import { CategoryModel } from "../models/Category";
+import { safeRedisDel } from "../config/redis";
 import { AuthenticatedRequest } from "../middlewares/auth";
 import { AppError } from "../utils/AppError";
 import { SocketService } from "../services/socketService";
@@ -117,7 +119,15 @@ export class ProviderController {
 
       // Acquire Redis Lock to prevent duplicate acceptances
       const lockKey = `booking_lock:${bookingId}`;
-      const lockAcquired = await redis.set(lockKey, providerIdStr, "EX", 10, "NX");
+      // Try to acquire an atomic lock (NX = only set if Not eXists)
+      // With graceful fallback: if Redis unavailable, allow the request
+      let lockAcquired: string | null = null;
+      try {
+        const { redis: redisClient } = await import("../config/redis");
+        lockAcquired = await redisClient.set(lockKey, providerIdStr, "EX", 10, "NX");
+      } catch {
+        lockAcquired = "OK"; // Fallback: allow if Redis unavailable
+      }
 
       if (!lockAcquired && action === "ACCEPT") {
         return next(new AppError("This job request has already been claimed by another provider.", 409));
@@ -126,18 +136,18 @@ export class ProviderController {
       const booking = await BookingModel.findById(bookingId);
 
       if (!booking) {
-        await redis.del(lockKey);
+        await safeRedisDel(lockKey);
         return next(new AppError("Booking record not found.", 404));
       }
 
       if (booking.status !== "PENDING" && booking.status !== "SEARCHING_PROVIDER") {
-        await redis.del(lockKey);
+        await safeRedisDel(lockKey);
         return next(new AppError("This booking is no longer open for acceptance.", 400));
       }
 
       if (action === "REJECT") {
         // Just release lock if any and return success
-        await redis.del(lockKey);
+        await safeRedisDel(lockKey);
         res.status(200).json({
           success: true,
           message: "Booking request rejected.",
@@ -156,7 +166,7 @@ export class ProviderController {
       );
 
       if (!updatedBooking) {
-        await redis.del(lockKey);
+        await safeRedisDel(lockKey);
         return next(new AppError("Failed to update booking status.", 500));
       }
 
@@ -166,7 +176,7 @@ export class ProviderController {
       });
 
       // Clear the dispatch queue in Redis
-      await redis.del(`booking_dispatch:${bookingId}`);
+      await safeRedisDel(`booking_dispatch:${bookingId}`);
 
       logger.info(`Booking ${bookingId} accepted by provider ${providerIdStr}`);
 
@@ -244,6 +254,118 @@ export class ProviderController {
           total: totalEarnings,
           jobsCount: bookings.length,
           history: formattedHistory,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Register or update provider profile after phone-auth onboarding.
+   * Called by mobile PartnerRegisterScreen.
+   * POST /api/v1/providers/register
+   */
+  public static async registerProvider(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return next(new AppError("Unauthorized", 401));
+
+      const { name, experience, categories, selfie, idCard } = req.body;
+
+      // Update user name if provided
+      if (name) {
+        await UserModel.findByIdAndUpdate(userId, { name });
+      }
+
+      // Update user role to PROVIDER
+      await UserModel.findByIdAndUpdate(userId, { role: "PROVIDER" });
+
+      // Resolve category IDs from slugs or names
+      let categoryIds: any[] = [];
+      if (Array.isArray(categories) && categories.length > 0) {
+        const cats = await CategoryModel.find({
+          $or: [
+            { slug: { $in: categories } },
+            { name: { $in: categories } },
+          ],
+        });
+        categoryIds = cats.map((c) => c._id);
+      }
+
+      // Upsert provider profile
+      const provider = await ProviderModel.findOneAndUpdate(
+        { userId },
+        {
+          $set: {
+            experience: parseInt(experience || "0"),
+            selfie: selfie || "",
+            idCard: idCard || "",
+            categories: categoryIds,
+            kycStatus: "PENDING",
+            verificationStatus: "UNVERIFIED",
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      logger.info(`Provider registered/updated: userId=${userId}`);
+
+      res.status(201).json({
+        success: true,
+        message: "Provider registration submitted. Your KYC is under review.",
+        provider: {
+          id: provider._id.toString(),
+          userId,
+          experience: provider.experience,
+          kycStatus: provider.kycStatus,
+          verificationStatus: provider.verificationStatus,
+          categories: categoryIds.map((id) => id.toString()),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Get the current provider's profile.
+   * GET /api/v1/providers/profile
+   */
+  public static async getProviderProfile(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return next(new AppError("Unauthorized", 401));
+
+      const provider = await ProviderModel.findOne({ userId })
+        .populate("userId", "name email phone")
+        .populate("categories", "name slug");
+
+      if (!provider) {
+        return next(new AppError("Provider profile not found.", 404));
+      }
+
+      res.status(200).json({
+        success: true,
+        provider: {
+          id: provider._id.toString(),
+          user: provider.userId,
+          experience: provider.experience,
+          rating: provider.rating,
+          totalJobs: provider.totalJobs,
+          kycStatus: provider.kycStatus,
+          verificationStatus: provider.verificationStatus,
+          categories: provider.categories,
+          serviceAreas: provider.serviceAreas,
+          availabilities: provider.availabilities,
         },
       });
     } catch (error) {

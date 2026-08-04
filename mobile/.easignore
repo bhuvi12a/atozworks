@@ -1,0 +1,10 @@
+# Exclude large folders not needed for EAS cloud build
+node_modules/
+.expo/
+dist/
+android/
+ios/
+build/
+*.log
+*.lock
+build_log_raw.txt

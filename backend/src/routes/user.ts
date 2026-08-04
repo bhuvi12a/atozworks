@@ -7,6 +7,10 @@ const router = Router();
 // Apply auth middleware to protect all user endpoints
 router.use(authenticate);
 
+// Profile routes
+router.get("/profile", UserController.getProfile);
+router.patch("/profile", UserController.updateProfile);
+
 // Addresses routes
 router.post("/addresses", UserController.addAddress);
 router.get("/addresses", UserController.getAddresses);

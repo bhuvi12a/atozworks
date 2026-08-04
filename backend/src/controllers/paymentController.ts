@@ -61,11 +61,18 @@ export class PaymentController {
         return next(new AppError("Missing signature verification parameters.", 400));
       }
 
-      const isVerified = PaymentService.verifySignature(
-        razorpayOrderId,
-        razorpayPaymentId,
-        razorpaySignature
-      );
+      let isVerified = false;
+
+      // Allow simulated payment success in dev mode for Expo Go testing
+      if (process.env.NODE_ENV === "development" && razorpaySignature === "DEV_BYPASS_SIGNATURE") {
+        isVerified = true;
+      } else {
+        isVerified = PaymentService.verifySignature(
+          razorpayOrderId,
+          razorpayPaymentId,
+          razorpaySignature
+        );
+      }
 
       if (!isVerified) {
         // Log failed verification attempt
