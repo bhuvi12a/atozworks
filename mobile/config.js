@@ -7,7 +7,7 @@ const getApiUrl = () => {
     return 'http://192.168.88.4:5000/api/v1';
   }
   // Production URL (Render Live Backend)
-  return 'https://atozworks.onrender.com/api/v1'; 
+  return 'https://atozworks-2.onrender.com/api/v1'; 
 };
 
 export const API_URL = getApiUrl();
