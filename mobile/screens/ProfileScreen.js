@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import {
-  User, Phone, LogOut, ChevronRight, HelpCircle,
+  Phone, LogOut, ChevronRight, HelpCircle,
   Shield, FileText, Star, Headphones, Sparkles
 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,12 +16,6 @@ const SESSION_KEY = '@atoz_user_session';
 export default function ProfileScreen({ navigation }) {
   const [session, setSession] = useState(null);
   const [bookingCount, setBookingCount] = useState(0);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadProfile();
-    }, [])
-  );
 
   const loadProfile = async () => {
     try {
@@ -41,6 +35,12 @@ export default function ProfileScreen({ navigation }) {
       console.warn(e);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [])
+  );
 
   const handleLogout = () => {
     Alert.alert('Log Out', 'Are you sure you want to log out?', [
@@ -165,6 +165,7 @@ export default function ProfileScreen({ navigation }) {
 
         {/* App Version */}
         <Text style={styles.versionText}>AtoZ Works v1.0.0 · Made in India 🇮🇳</Text>
+        <Text style={styles.developerText}>Developed by booworks.co</Text>
 
         {/* Logout */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.85}>
@@ -265,7 +266,11 @@ const styles = StyleSheet.create({
 
   versionText: {
     textAlign: 'center', fontSize: 11, color: '#94a3b8',
-    marginBottom: 16, fontWeight: '500',
+    marginBottom: 4, fontWeight: '500',
+  },
+  developerText: {
+    textAlign: 'center', fontSize: 11, color: '#94a3b8',
+    marginBottom: 16, fontWeight: '700',
   },
 
   logoutBtn: {

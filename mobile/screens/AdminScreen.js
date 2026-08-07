@@ -46,34 +46,8 @@ export default function AdminScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Initial load on mount
-  useEffect(() => {
-    fetchAdminData();
-  }, []);
-
-  // Screen Focus & Live Polling
-  useFocusEffect(
-    React.useCallback(() => {
-      if (isAuthenticated) {
-        fetchAdminData();
-        const interval = setInterval(fetchAdminData, 3000); // 3s auto polling
-        return () => clearInterval(interval);
-      }
-    }, [isAuthenticated])
-  );
-
-  const handleLogin = () => {
-    setAuthError('');
-    if (password === 'AtoZWorks@Admin2026!') {
-      setIsAuthenticated(true);
-      fetchAdminData();
-    } else {
-      setAuthError('Invalid Admin Password. Please try again.');
-    }
-  };
-
-  const fetchAdminData = async () => {
-    setRefreshing(true);
+  const fetchAdminData = async (isManualRefresh = false) => {
+    if (isManualRefresh) setRefreshing(true);
     let allBookings = [];
 
     // 1. Read from local storage first (0.0s instant load)
@@ -113,7 +87,33 @@ export default function AdminScreen({ navigation }) {
 
     setBookings(allBookings);
     setLoading(false);
-    setRefreshing(false);
+    if (isManualRefresh) setRefreshing(false);
+  };
+
+  // Initial load on mount
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
+
+  // Screen Focus & Live Polling
+  useFocusEffect(
+    React.useCallback(() => {
+      if (isAuthenticated) {
+        fetchAdminData();
+        const interval = setInterval(fetchAdminData, 3000); // 3s auto polling
+        return () => clearInterval(interval);
+      }
+    }, [isAuthenticated])
+  );
+
+  const handleLogin = () => {
+    setAuthError('');
+    if (password === 'AtoZWorks@Admin2026!') {
+      setIsAuthenticated(true);
+      fetchAdminData();
+    } else {
+      setAuthError('Invalid Admin Password. Please try again.');
+    }
   };
 
   const handleCallCustomer = (phone) => {
@@ -290,7 +290,7 @@ ${mapsPinUrl}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 
-            onRefresh={fetchAdminData} 
+            onRefresh={() => fetchAdminData(true)} 
             colors={['#00a8e8']}
             tintColor="#00a8e8"
           />

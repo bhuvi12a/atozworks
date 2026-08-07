@@ -47,7 +47,14 @@ class PaymentController {
             if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature || !bookingId) {
                 return next(new AppError_1.AppError("Missing signature verification parameters.", 400));
             }
-            const isVerified = paymentService_1.PaymentService.verifySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
+            let isVerified = false;
+            // Allow simulated payment success in dev mode for Expo Go testing
+            if (process.env.NODE_ENV === "development" && razorpaySignature === "DEV_BYPASS_SIGNATURE") {
+                isVerified = true;
+            }
+            else {
+                isVerified = paymentService_1.PaymentService.verifySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
+            }
             if (!isVerified) {
                 // Log failed verification attempt
                 await Payment_1.PaymentModel.updateMany({ bookingId }, { status: "FAILED" });

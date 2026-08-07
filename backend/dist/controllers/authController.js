@@ -304,7 +304,7 @@ class AuthController {
                     name: `User_${clean.slice(-4)}`,
                     email: `${clean}@phone.atozworks.in`, // placeholder, can be updated later
                     phone: clean,
-                    passwordHash: "", // not used for phone-auth users
+                    passwordHash: "NO_PASSWORD_PHONE_AUTH", // Mongoose rejects empty strings for required fields
                     role: "CUSTOMER",
                 });
                 logger_1.logger.info(`New phone-auth user created: ${clean}`);

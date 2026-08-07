@@ -24,7 +24,7 @@ const RESEND_COOLDOWN = 30;
 
 // ─── Animated Glow Blob ───────────────────────────────────────────────────────
 function AnimatedBlob({ style }) {
-  const anim = useRef(new Animated.Value(0)).current;
+  const [anim] = useState(() => new Animated.Value(0));
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -32,7 +32,7 @@ function AnimatedBlob({ style }) {
         Animated.timing(anim, { toValue: 0, duration: 4000, useNativeDriver: true }),
       ])
     ).start();
-  }, []);
+  }, [anim]);
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [0, -18] });
   return <Animated.View style={[style, { transform: [{ translateY }] }]} />;
 }
@@ -46,9 +46,9 @@ export default function LoginScreen({ navigation }) {
   const [error, setError] = useState('');
 
   const otpRefs = useRef([]);
-  const shakeAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(40)).current;
+  const [shakeAnim] = useState(() => new Animated.Value(0));
+  const [fadeAnim] = useState(() => new Animated.Value(0));
+  const [slideAnim] = useState(() => new Animated.Value(40));
 
   const animateIn = useCallback(() => {
     fadeAnim.setValue(0);
@@ -57,9 +57,9 @@ export default function LoginScreen({ navigation }) {
       Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
       Animated.spring(slideAnim, { toValue: 0, tension: 80, friction: 10, useNativeDriver: true }),
     ]).start();
-  }, []);
+  }, [fadeAnim, slideAnim]);
 
-  useEffect(() => { animateIn(); }, [step]);
+  useEffect(() => { animateIn(); }, [step, animateIn]);
 
   useEffect(() => {
     if (resendTimer <= 0) return;
@@ -282,6 +282,8 @@ export default function LoginScreen({ navigation }) {
                     Privacy Policy
                   </Text>
                 </Text>
+                
+                <Text style={styles.developerText}>Developed by booworks.co</Text>
               </View>
 
             </Animated.View>
@@ -382,6 +384,8 @@ export default function LoginScreen({ navigation }) {
                 <Text style={styles.trustDot}>·</Text>
                 <Text style={styles.trustText}>🇮🇳 Made in India</Text>
               </View>
+
+              <Text style={styles.developerText}>Developed by booworks.co</Text>
             </View>
 
           </Animated.View>
@@ -485,4 +489,5 @@ const styles = StyleSheet.create({
   trustDot: { color: '#334155' },
   termsText: { fontSize: 11, color: '#475569', textAlign: 'center', lineHeight: 18 },
   termsLink: { color: '#00a8e8', fontWeight: '600' },
+  developerText: { fontSize: 10, color: '#334155', textAlign: 'center', marginTop: 14, fontWeight: '500', opacity: 0.6 },
 });
