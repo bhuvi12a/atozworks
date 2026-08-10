@@ -115,38 +115,7 @@ export default function NewBookingScreen({ route, navigation }) {
       if (!bookingRes.ok) throw new Error(bookingData.message || 'Failed to create booking');
 
       const bookingId = bookingData.booking.id;
-
-      // 2. Create Razorpay Order
-      const orderRes = await fetch(`${API_URL}/payments/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ bookingId }),
-      });
-
-      const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.message || 'Failed to create payment order');
-
-      const { razorpayOrderId } = orderData.order;
-
-      // 3. Simulate Razorpay Success (DEV BYPASS)
-      const verifyRes = await fetch(`${API_URL}/payments/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          bookingId,
-          razorpayOrderId: razorpayOrderId,
-          razorpayPaymentId: `sim_${Date.now()}`,
-          razorpaySignature: 'DEV_BYPASS_SIGNATURE'
-        }),
-      });
-
-      if (!verifyRes.ok) throw new Error('Payment verification failed');
+      // Payment is collected on-site after service completion (Pay After Service model)
 
       // ✅ Save booking locally so it appears in the Bookings tab immediately
       const newBooking = {
