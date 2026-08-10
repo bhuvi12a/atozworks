@@ -9,6 +9,7 @@ router.post("/webhook", PaymentController.handleWebhook);
 
 // Protected endpoints for customer client checkout flows
 router.post("/order", authenticate, PaymentController.createOrder);
+router.post("/create-order", authenticate, PaymentController.createOrder); // alias for mobile app
 router.post("/verify", authenticate, PaymentController.verifyPayment);
 
 export default router;

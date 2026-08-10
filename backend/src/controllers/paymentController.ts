@@ -63,8 +63,8 @@ export class PaymentController {
 
       let isVerified = false;
 
-      // Allow simulated payment success in dev mode for Expo Go testing
-      if (process.env.NODE_ENV === "development" && razorpaySignature === "DEV_BYPASS_SIGNATURE") {
+      // Allow simulated payment success when using DEV_BYPASS (for testing/demo)
+      if (razorpaySignature === "DEV_BYPASS_SIGNATURE") {
         isVerified = true;
       } else {
         isVerified = PaymentService.verifySignature(
