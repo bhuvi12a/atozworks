@@ -1,6 +1,8 @@
 import { Response, NextFunction } from "express";
+import mongoose from "mongoose";
 import { BookingModel } from "../models/Booking";
 import { ServiceModel } from "../models/Service";
+import { CategoryModel } from "../models/Category";
 import { AddressModel } from "../models/Address";
 import { ProviderModel } from "../models/Provider";
 import { AuthenticatedRequest } from "../middlewares/auth";
@@ -107,9 +109,19 @@ export class BookingController {
         return next(new AppError("Missing required booking specifications.", 400));
       }
 
-      // 1. Verify service validity
-      const service = await ServiceModel.findOne({ _id: serviceId, active: true });
+      // 1. Verify service validity (Handle both actual service ObjectIds or category slugs)
+      let service;
+      if (mongoose.Types.ObjectId.isValid(serviceId)) {
+        service = await ServiceModel.findOne({ _id: serviceId, active: true });
+      } else {
+        const category = await CategoryModel.findOne({ slug: serviceId });
+        if (category) {
+          service = await ServiceModel.findOne({ categoryId: category._id, active: true });
+        }
+      }
+      
       if (!service) return next(new AppError("Service is not available or inactive.", 404));
+      const finalServiceId = service._id;
 
       // 2. Fetch or create address
       let resolvedAddressId = addressId;
@@ -134,7 +146,7 @@ export class BookingController {
       // 3. Compute billing invoice
       const materials = parseFloat(materialCharges || "0");
       const pricing = await BookingEngine.calculatePrice(
-        serviceId,
+        finalServiceId.toString(),
         bookingDate,
         bookingTime,
         materials,
@@ -150,8 +162,8 @@ export class BookingController {
       const booking = await BookingModel.create({
         bookingNumber,
         customerId,
-        serviceId,
-        addressId,
+        serviceId: finalServiceId,
+        addressId: resolvedAddressId,
         bookingDate,
         bookingTime,
         status: "PENDING",
