@@ -100,9 +100,10 @@ export class BookingController {
       const customerId = req.user?.id;
       if (!customerId) return next(new AppError("Unauthorized", 401));
 
-      const { serviceId, addressId, bookingDate, bookingTime, couponCode, materialCharges } = req.body;
+      const { serviceId, addressId, address: addressData, bookingDate, bookingTime, couponCode, materialCharges } = req.body;
+      console.log("CREATE BOOKING PAYLOAD:", req.body);
 
-      if (!serviceId || !addressId || !bookingDate || !bookingTime) {
+      if (!serviceId || (!addressId && !addressData) || !bookingDate || !bookingTime) {
         return next(new AppError("Missing required booking specifications.", 400));
       }
 
@@ -110,8 +111,24 @@ export class BookingController {
       const service = await ServiceModel.findOne({ _id: serviceId, active: true });
       if (!service) return next(new AppError("Service is not available or inactive.", 404));
 
-      // 2. Fetch address coordinates
-      const address = await AddressModel.findOne({ _id: addressId, userId: customerId });
+      // 2. Fetch or create address
+      let resolvedAddressId = addressId;
+      if (!resolvedAddressId && addressData) {
+        const newAddress = await AddressModel.create({
+          userId: customerId,
+          houseNo: addressData.houseNo || "N/A",
+          street: addressData.street || "N/A",
+          landmark: addressData.landmark || "",
+          city: addressData.city || "Hosur",
+          state: addressData.state || "Tamil Nadu",
+          pincode: addressData.pincode || "635109",
+          location: addressData.location || { type: "Point", coordinates: [77.8270, 12.7409] },
+          isDefault: false
+        });
+        resolvedAddressId = newAddress._id;
+      }
+
+      const address = await AddressModel.findOne({ _id: resolvedAddressId, userId: customerId });
       if (!address) return next(new AppError("Invalid or unauthorized address choice.", 404));
 
       // 3. Compute billing invoice
