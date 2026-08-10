@@ -174,11 +174,16 @@ export class BookingController {
       logger.info(`Booking created: ${booking.bookingNumber} for Customer: ${customerId}`);
 
       // 6. Trigger Asynchronous Matchmaking Dispatch Loop
+      const categoryIdStr = service.categoryId.toString();
+      const location = address.location?.coordinates || [77.8270, 12.7409];
+      const customerLon = location[0];
+      const customerLat = location[1];
+
       BookingEngine.dispatchBookingRequest(
         booking._id.toString(),
-        service.categoryId.toString(),
-        address.location.coordinates[1], // latitude
-        address.location.coordinates[0], // longitude
+        categoryIdStr,
+        customerLat,
+        customerLon,
         bookingDate,
         bookingTime
       ).catch((err) => logger.error("Matchmaker failure after booking create:", err));
