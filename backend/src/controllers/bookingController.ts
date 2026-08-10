@@ -102,7 +102,7 @@ export class BookingController {
       const customerId = req.user?.id;
       if (!customerId) return next(new AppError("Unauthorized", 401));
 
-      const { serviceId, addressId, address: addressData, bookingDate, bookingTime, couponCode, materialCharges } = req.body;
+      const { serviceId, serviceName, price, addressId, address: addressData, bookingDate, bookingTime, couponCode, materialCharges } = req.body;
       console.log("CREATE BOOKING PAYLOAD:", req.body);
 
       if (!serviceId || (!addressId && !addressData) || !bookingDate || !bookingTime) {
@@ -114,9 +114,27 @@ export class BookingController {
       if (mongoose.Types.ObjectId.isValid(serviceId)) {
         service = await ServiceModel.findOne({ _id: serviceId, active: true });
       } else {
-        const category = await CategoryModel.findOne({ slug: serviceId });
-        if (category) {
-          service = await ServiceModel.findOne({ categoryId: category._id, active: true });
+        let category = await CategoryModel.findOne({ slug: serviceId });
+        if (!category) {
+           // Auto-create category if it doesn't exist in the database
+           category = await CategoryModel.create({
+             name: serviceName || serviceId,
+             slug: serviceId,
+             icon: "Wrench"
+           });
+        }
+        
+        service = await ServiceModel.findOne({ categoryId: category._id, active: true });
+        if (!service) {
+           // Auto-create service under this category if it doesn't exist
+           service = await ServiceModel.create({
+             categoryId: category._id,
+             title: serviceName || `${category.name} Service`,
+             description: `Professional ${serviceName || category.name} service.`,
+             duration: 60,
+             basePrice: price ? Number(price) : 199,
+             active: true
+           });
         }
       }
       
