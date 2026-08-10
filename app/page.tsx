@@ -53,9 +53,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-[#e3f2fd] via-[#f8fbfe] to-white text-[#0f172a] font-sans overflow-x-hidden">
       {/* Floating Header */}
       <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl">
-        <div className="backdrop-blur-xl bg-white/80 border border-[#82cdff]/30 rounded-2xl px-6 py-1 flex items-center justify-between shadow-[0_8px_30px_rgba(130,200,255,0.08)]">
+        <div className="backdrop-blur-xl bg-white/90 border border-[#82cdff]/30 rounded-2xl px-4 md:px-6 py-2 md:py-1 flex items-center justify-between shadow-[0_8px_30px_rgba(130,200,255,0.08)] relative z-20">
           <Link href="/" className="flex items-center">
-            <img src="/images/logo.png" alt="AtoZ Works Logo" className="h-16 md:h-24 w-auto object-contain hover:scale-115 transition-all duration-300 transform" />
+            <img src="/images/logo.png" alt="AtoZ Works Logo" className="h-10 sm:h-12 md:h-24 w-auto object-contain hover:scale-105 transition-all duration-300 transform" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -74,17 +74,18 @@ export default function Home() {
           </nav>
 
           <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-700">
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
+        {/* Mobile Nav Dropdown overlay */}
         {menuOpen && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mt-2 p-4 bg-white rounded-2xl shadow-xl border border-[#82cdff]/20 flex flex-col gap-4 md:hidden">
-            <a href="#services" className="font-medium text-slate-700 hover:text-[#0088ff]" onClick={() => setMenuOpen(false)}>Services</a>
-            <a href="#why" className="font-medium text-slate-700 hover:text-[#0088ff]" onClick={() => setMenuOpen(false)}>Why Us</a>
-            <a href="#about" className="font-medium text-slate-700 hover:text-[#0088ff]" onClick={() => setMenuOpen(false)}>About & Franchise</a>
-            <Link href="/bookings" className="font-medium text-slate-700 hover:text-[#0088ff]">My Bookings</Link>
-            <Link href="/partner/register" className="font-medium text-[#0088ff] hover:underline">Join as Partner</Link>
-            <a href="#services" className="text-center bg-gradient-to-r from-[#82cdff] to-[#0088ff] text-white py-3 rounded-xl font-semibold" onClick={() => setMenuOpen(false)}>Book Now</a>
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="absolute top-full left-0 right-0 mt-2 p-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#82cdff]/30 flex flex-col gap-4 md:hidden z-10 mx-2">
+            <a href="#services" className="font-semibold text-slate-700 hover:text-[#0088ff] px-2 py-1" onClick={() => setMenuOpen(false)}>Services</a>
+            <a href="#why" className="font-semibold text-slate-700 hover:text-[#0088ff] px-2 py-1" onClick={() => setMenuOpen(false)}>Why Us</a>
+            <a href="#about" className="font-semibold text-slate-700 hover:text-[#0088ff] px-2 py-1" onClick={() => setMenuOpen(false)}>About & Franchise</a>
+            <Link href="/bookings" className="font-semibold text-slate-700 hover:text-[#0088ff] px-2 py-1">My Bookings</Link>
+            <Link href="/partner/register" className="font-semibold text-[#0088ff] hover:underline px-2 py-1">Join as Partner</Link>
+            <a href="#services" className="text-center bg-gradient-to-r from-[#82cdff] to-[#0088ff] text-white py-3.5 rounded-xl font-bold shadow-md shadow-[#82cdff]/30" onClick={() => setMenuOpen(false)}>Book Now</a>
           </motion.div>
         )}
       </header>
@@ -115,7 +116,7 @@ export default function Home() {
               </div>
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-4"
+                className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter mb-4"
               >
                 Complete Home Services at Your Doorstep.
               </motion.h1>
@@ -169,11 +170,11 @@ export default function Home() {
                 )}
               </div>
             </div>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <button onClick={() => setAllServicesOpen(true)} className="inline-flex items-center gap-2 bg-white text-[#0066cc] px-8 py-4 rounded-2xl font-bold shadow-lg hover:-translate-y-1 transition-transform cursor-pointer">
+            <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-4 w-full">
+              <button onClick={() => setAllServicesOpen(true)} className="inline-flex items-center justify-center gap-2 bg-white text-[#0066cc] px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl font-bold shadow-lg hover:-translate-y-1 transition-transform cursor-pointer w-full sm:w-auto">
                 Book a Service <ArrowRight size={18} />
               </button>
-              <button onClick={() => setAllServicesOpen(true)} className="inline-flex items-center gap-2 border-2 border-white/30 text-white px-8 py-4 rounded-2xl font-bold hover:bg-white/10 transition cursor-pointer">
+              <button onClick={() => setAllServicesOpen(true)} className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl font-bold hover:bg-white/10 transition cursor-pointer w-full sm:w-auto">
                 Explore Services
               </button>
             </div>
@@ -198,7 +199,7 @@ export default function Home() {
         </section>
 
         {/* Dynamic Trust Stats Row */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-24 text-center">
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16 md:mb-24 text-center">
           {[
             { icon: ShieldCheck, title: "100% Verified", desc: "Police background checks" },
             { icon: Clock, title: "Same Day Service", desc: "Booking to doorstep in hours" },
@@ -231,7 +232,7 @@ export default function Home() {
           </div>
 
           {/* Magazine Style Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[180px] md:auto-rows-[220px]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 auto-rows-[160px] sm:auto-rows-[180px] md:auto-rows-[220px]">
             
             {/* Featured Big Card (AC Repair) */}
             <Link href="/services/ac-repair" className="col-span-2 row-span-2 block">
@@ -262,13 +263,13 @@ export default function Home() {
                     className="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
                   />
                   <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                  <div className="p-6 h-full flex flex-col justify-between relative z-20">
-                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-white shadow-lg transform group-hover:rotate-6 transition-transform duration-300`}>
-                      <s.icon size={22} />
+                  <div className="p-4 sm:p-5 md:p-6 h-full flex flex-col justify-between relative z-20">
+                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-white shadow-lg transform group-hover:rotate-6 transition-transform duration-300`}>
+                      <s.icon className="w-5 h-5 md:w-[22px] md:h-[22px]" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-800 group-hover:text-white transition-colors duration-300 mb-1">{s.name}</h4>
-                      <p className="text-xs text-slate-400 group-hover:text-blue-100 transition-colors duration-300">Verified Pros</p>
+                      <h4 className="text-sm md:text-base font-bold text-slate-800 group-hover:text-white transition-colors duration-300 mb-0.5 md:mb-1">{s.name}</h4>
+                      <p className="text-[10px] md:text-xs text-slate-400 group-hover:text-blue-100 transition-colors duration-300">Verified Pros</p>
                     </div>
                   </div>
                 </TiltCard>
@@ -307,13 +308,13 @@ export default function Home() {
                      className="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"
                    />
                    <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                   <div className="p-6 h-full flex flex-col justify-between relative z-20">
-                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-white shadow-lg transform group-hover:rotate-6 transition-transform duration-300`}>
-                       <s.icon size={22} />
+                   <div className="p-4 sm:p-5 md:p-6 h-full flex flex-col justify-between relative z-20">
+                     <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center text-white shadow-lg transform group-hover:rotate-6 transition-transform duration-300`}>
+                       <s.icon className="w-5 h-5 md:w-[22px] md:h-[22px]" />
                      </div>
                      <div>
-                       <h4 className="font-bold text-slate-800 group-hover:text-white transition-colors duration-300 mb-1">{s.name}</h4>
-                       <p className="text-xs text-slate-400 group-hover:text-blue-100 transition-colors duration-300">Verified Pros</p>
+                       <h4 className="text-sm md:text-base font-bold text-slate-800 group-hover:text-white transition-colors duration-300 mb-0.5 md:mb-1">{s.name}</h4>
+                       <p className="text-[10px] md:text-xs text-slate-400 group-hover:text-blue-100 transition-colors duration-300">Verified Pros</p>
                      </div>
                    </div>
                  </TiltCard>
@@ -344,14 +345,14 @@ export default function Home() {
         </section>
 
         {/* INTERACTIVE WHY US SECTION */}
-        <section id="why" className="mb-32 bg-gradient-to-br from-[#0033aa] to-[#001155] border border-[#82cdff]/30 rounded-[2.5rem] p-8 md:p-16 text-white relative overflow-hidden shadow-2xl">
+        <section id="why" className="mb-24 md:mb-32 bg-gradient-to-br from-[#0033aa] to-[#001155] border border-[#82cdff]/30 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-16 text-white relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -translate-x-1/2" />
           
-          <div className="grid md:grid-cols-2 gap-16 relative z-10">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-16 relative z-10">
             <div>
-              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">Why AtoZ Works is different.</h2>
-              <p className="text-blue-200 text-lg leading-relaxed mb-8">Founded and led by our visionary CEO Praveen Billa, we don&apos;t just connect you with workers. We guarantee a premium, seamless experience from booking to completion, built on absolute trust and quality service.</p>
-              <a href="#services" className="inline-flex items-center gap-3 bg-white text-[#0033aa] px-8 py-4 rounded-2xl font-bold hover:-translate-y-1 transition-transform shadow-[0_10px_25px_-5px_rgba(0,50,200,0.2)] cursor-pointer">
+              <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 md:mb-6 leading-tight">Why AtoZ Works is different.</h2>
+              <p className="text-blue-200 text-base md:text-lg leading-relaxed mb-6 md:mb-8">Founded and led by our visionary CEO Praveen Billa, we don&apos;t just connect you with workers. We guarantee a premium, seamless experience from booking to completion, built on absolute trust and quality service.</p>
+              <a href="#services" className="inline-flex items-center justify-center gap-3 bg-white text-[#0033aa] px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold hover:-translate-y-1 transition-transform shadow-[0_10px_25px_-5px_rgba(0,50,200,0.2)] cursor-pointer w-full md:w-auto">
                 Get Started <ArrowRight size={18} />
               </a>
             </div>
@@ -368,9 +369,9 @@ export default function Home() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="flex gap-6 p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md hover:border-white/30 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
+                  className="flex flex-col sm:flex-row items-start gap-4 p-5 md:p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md hover:border-white/30 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0033aa] transition-all flex-shrink-0">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-white/10 flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#0033aa] transition-all flex-shrink-0">
                     <item.icon size={24} />
                   </div>
                   <div>
@@ -384,15 +385,15 @@ export default function Home() {
         </section>
 
         {/* ABOUT & FRANCHISE SECTION */}
-        <section id="about" className="mb-32 grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+        <section id="about" className="mb-24 md:mb-32 grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
           {/* About Company Card */}
-          <div className="bg-white border border-[#82cdff]/20 rounded-[2.5rem] p-8 md:p-12 shadow-xl relative overflow-hidden flex flex-col justify-between group">
+          <div className="bg-white border border-[#82cdff]/20 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 shadow-xl relative overflow-hidden flex flex-col justify-between group">
             <div className="absolute top-0 right-0 w-48 h-48 bg-[#82cdff]/5 rounded-full blur-2xl pointer-events-none" />
             <div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 text-[#0066cc] border border-[#82cdff]/20 rounded-full text-xs font-bold mb-6">
                 <Award size={14} className="text-[#0088ff]" /> About AtoZ Works
               </div>
-              <h3 className="text-3xl font-extrabold tracking-tight text-slate-800 mb-6 leading-tight">
+              <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-800 mb-6 leading-tight">
                 4 Years of Excellence in Hosur
               </h3>
               <p className="text-slate-600 leading-relaxed mb-6">
@@ -420,13 +421,13 @@ export default function Home() {
           </div>
 
           {/* Franchise Card */}
-          <div className="bg-gradient-to-br from-[#0a1e3f] to-[#000a1a] border border-blue-900/30 rounded-[2.5rem] p-8 md:p-12 text-white shadow-xl relative overflow-hidden flex flex-col justify-between group">
+          <div className="bg-gradient-to-br from-[#0a1e3f] to-[#000a1a] border border-blue-900/30 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 text-white shadow-xl relative overflow-hidden flex flex-col justify-between group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#0066cc]/10 rounded-full blur-[80px] pointer-events-none" />
             <div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/10 text-blue-300 border border-white/10 rounded-full text-xs font-bold mb-6">
                 <Store size={14} className="text-blue-300" /> Franchise Opportunity
               </div>
-              <h3 className="text-3xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+              <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-6 leading-tight">
                 Partner with Hosur’s #1 Home Services Brand
               </h3>
               <p className="text-blue-100/80 leading-relaxed mb-6">
@@ -460,7 +461,7 @@ export default function Home() {
         </section>
 
         {/* PARTNER SIGNUP PROMO SECTION */}
-        <section className="mb-32 bg-white border border-[#82cdff]/20 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+        <section className="mb-24 md:mb-32 bg-white border border-[#82cdff]/20 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 relative overflow-hidden shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
           <div className="absolute -top-12 -left-12 w-48 h-48 bg-gradient-to-br from-[#82cdff]/10 to-[#0088ff]/10 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-gradient-to-br from-[#0088ff]/5 to-[#82cdff]/5 rounded-full blur-2xl pointer-events-none" />
           
@@ -468,18 +469,18 @@ export default function Home() {
             <span className="inline-block px-3 py-1 bg-[#82cdff]/15 text-[#0066cc] border border-[#82cdff]/20 rounded-full text-xs font-bold">
               EARN WITH ATOZ WORKS
             </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800">
+            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-slate-800">
               Become an AtoZ Works Service Partner
             </h2>
             <p className="text-slate-600 leading-relaxed text-sm md:text-base">
               Are you a skilled technician, cleaner, plumber, or electrician? Join Hosur&apos;s most trusted home services platform. Get a steady flow of customers, set your own working hours, and grow your earnings.
             </p>
-            <div className="flex flex-wrap gap-4 text-xs font-semibold text-slate-500 pt-2">
+            <div className="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4 text-xs font-semibold text-slate-500 pt-2">
               <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
                 ✓ Weekly Payouts
               </span>
               <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                ✓ Flexible Working Hours
+                ✓ Flexible Hours
               </span>
               <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
                 ✓ Steady Jobs Flow
@@ -490,7 +491,7 @@ export default function Home() {
           <div className="relative z-10 flex-shrink-0 w-full md:w-auto">
             <Link 
               href="/partner/register" 
-              className="inline-flex items-center justify-center gap-2 w-full md:w-auto bg-gradient-to-r from-[#82cdff] to-[#0088ff] text-white px-8 py-4 rounded-2xl font-bold shadow-lg hover:brightness-95 transition-all text-center cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 w-full md:w-auto bg-gradient-to-r from-[#82cdff] to-[#0088ff] text-white px-6 md:px-8 py-3.5 md:py-4 rounded-2xl font-bold shadow-lg hover:brightness-95 transition-all text-center cursor-pointer"
             >
               Register as Partner <ArrowRight size={16} />
             </Link>
@@ -586,11 +587,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="border-t border-[#82cdff]/15 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+          <div className="border-t border-[#82cdff]/15 pt-8 flex flex-col sm:flex-row justify-between items-center gap-6 text-xs text-slate-400 text-center sm:text-left">
             <div>
               © {new Date().getFullYear()} AtoZ Works. All rights reserved.
             </div>
-            <div className="flex gap-6 font-medium">
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 font-medium">
               <a href="#" className="hover:text-[#0088ff] transition">Privacy Policy</a>
               <a href="#" className="hover:text-[#0088ff] transition">Terms of Service</a>
               <a href="#" className="hover:text-[#0088ff] transition">Refund Policy</a>
@@ -617,7 +618,7 @@ export default function Home() {
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="bg-white/95 backdrop-blur-xl border border-[#82cdff]/30 rounded-[2.5rem] shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto relative z-10 p-6 md:p-10 flex flex-col"
+              className="bg-white/95 backdrop-blur-xl border border-[#82cdff]/30 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto relative z-10 p-5 md:p-10 flex flex-col"
             >
               {/* Header */}
               <div className="flex justify-between items-start mb-8 sticky top-0 bg-white/95 backdrop-blur-md pb-4 border-b border-slate-100 z-20">
