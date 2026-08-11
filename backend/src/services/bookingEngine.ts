@@ -234,7 +234,7 @@ export class BookingEngine {
         rating: p.rating,
       });
 
-      // Firebase FCM / SMS fallback
+      // Dispatch Push / SMS fallback
       await NotificationService.sendPush(
         p.providerId,
         "New Booking Available",

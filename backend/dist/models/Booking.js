@@ -6,8 +6,8 @@ const BookingSchema = new mongoose_1.Schema({
     bookingNumber: { type: String, required: true, unique: true, index: true },
     customerId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     providerId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Provider", index: true },
-    serviceId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Service", required: true },
-    addressId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Address", required: true },
+    serviceId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Service" },
+    addressId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Address" },
     bookingDate: { type: String, required: true },
     bookingTime: { type: String, required: true },
     status: {
@@ -27,7 +27,7 @@ const BookingSchema = new mongoose_1.Schema({
         default: "PENDING",
         index: true,
     },
-    estimatedPrice: { type: Number, required: true },
+    estimatedPrice: { type: Number, default: 199 },
     finalPrice: { type: Number },
     paymentStatus: {
         type: String,

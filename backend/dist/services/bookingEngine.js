@@ -166,7 +166,7 @@ class BookingEngine {
                 distance: p.distance,
                 rating: p.rating,
             });
-            // Firebase FCM / SMS fallback
+            // Dispatch Push / SMS fallback
             await notification_1.NotificationService.sendPush(p.providerId, "New Booking Available", `Job location is ${p.distance} km away. Tap to accept.`, "BOOKING_REQUEST");
         }
     }

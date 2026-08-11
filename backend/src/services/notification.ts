@@ -1,18 +1,15 @@
-import { firebaseApp } from "../config/firebase";
 import { NotificationModel } from "../models/Notification";
 import { logger } from "../utils/logger";
 
 export class NotificationService {
   /**
-   * Sends a push notification to a user using Firebase FCM (or logs it to console as fallback).
-   * Persists the notification record to the database.
+   * Sends a push notification to a user (persists the record and logs it).
    */
   public static async sendPush(
     userId: string,
     title: string,
     message: string,
-    type: string,
-    fcmToken?: string
+    type: string
   ): Promise<void> {
     try {
       // 1. Persist notification in database
@@ -25,26 +22,7 @@ export class NotificationService {
       });
 
       logger.info(`Notification stored in DB for User ID ${userId}: [${title}] ${message}`);
-
-      // 2. Dispatch Push via Firebase Admin if configured and token is present
-      if (firebaseApp && fcmToken) {
-        const payload = {
-          notification: {
-            title,
-            body: message,
-          },
-          data: {
-            type,
-            click_action: "FLUTTER_NOTIFICATION_CLICK", // for mobile deep linking
-          },
-          token: fcmToken,
-        };
-
-        const response = await firebaseApp.messaging().send(payload);
-        logger.info(`Successfully sent FCM push notification response: ${response}`);
-      } else {
-        logger.debug(`FCM not initialized or client device FCM token missing. Logging mock push: [${title}] -> ${message}`);
-      }
+      logger.debug(`FCM / Push integration disabled. Logging mock push: [${title}] -> ${message}`);
     } catch (error) {
       logger.error(`Error processing push notification for User ID ${userId}:`, error);
     }
