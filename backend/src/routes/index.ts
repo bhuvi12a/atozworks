@@ -3,7 +3,7 @@ import authRoutes from "./auth";
 import userRoutes from "./user";
 import providerRoutes from "./provider";
 import bookingRoutes from "./booking";
-import paymentRoutes from "./payment";
+
 import reviewRoutes from "./review";
 import adminRoutes from "./admin";
 
@@ -14,7 +14,7 @@ router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/providers", providerRoutes);
 router.use("/bookings", bookingRoutes);
-router.use("/payments", paymentRoutes);
+
 router.use("/reviews", reviewRoutes);
 router.use("/admin", adminRoutes);
 

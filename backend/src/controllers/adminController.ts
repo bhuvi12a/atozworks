@@ -5,7 +5,7 @@ import { UserModel } from "../models/User";
 import { ServiceModel } from "../models/Service";
 import { CouponModel } from "../models/Coupon";
 import { CategoryModel } from "../models/Category";
-import { PaymentService } from "../services/paymentService";
+
 import { AppError } from "../utils/AppError";
 import { logger } from "../utils/logger";
 
@@ -128,12 +128,21 @@ export class AdminController {
         return next(new AppError("Booking ID is required.", 400));
       }
 
-      const refundResult = await PaymentService.processRefund(bookingId);
+      // Pay After Service model: Just mark the booking as refunded/cancelled
+      const booking = await BookingModel.findByIdAndUpdate(
+        bookingId,
+        { paymentStatus: "REFUNDED", status: "REFUNDED" },
+        { new: true }
+      );
+
+      if (!booking) {
+        return next(new AppError("Booking not found.", 404));
+      }
 
       res.status(200).json({
         success: true,
-        message: "Refund issued successfully.",
-        refund: refundResult,
+        message: "Refund processed successfully.",
+        booking,
       });
     } catch (error) {
       next(error);
