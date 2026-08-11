@@ -17,6 +17,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "package": "com.atozworks.app",
+      "versionCode": 2,
       "googleServicesFile": "./google-services.json",
       "minSdkVersion": 24
     },
