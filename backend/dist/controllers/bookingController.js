@@ -1,8 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingController = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const Booking_1 = require("../models/Booking");
 const Service_1 = require("../models/Service");
+const Category_1 = require("../models/Category");
 const Address_1 = require("../models/Address");
 const Provider_1 = require("../models/Provider");
 const bookingEngine_1 = require("../services/bookingEngine");
@@ -91,21 +96,64 @@ class BookingController {
             const customerId = req.user?.id;
             if (!customerId)
                 return next(new AppError_1.AppError("Unauthorized", 401));
-            const { serviceId, addressId, bookingDate, bookingTime, couponCode, materialCharges } = req.body;
-            if (!serviceId || !addressId || !bookingDate || !bookingTime) {
+            const { serviceId, serviceName, price, addressId, address: addressData, bookingDate, bookingTime, couponCode, materialCharges } = req.body;
+            console.log("CREATE BOOKING PAYLOAD:", req.body);
+            if (!serviceId || (!addressId && !addressData) || !bookingDate || !bookingTime) {
                 return next(new AppError_1.AppError("Missing required booking specifications.", 400));
             }
-            // 1. Verify service validity
-            const service = await Service_1.ServiceModel.findOne({ _id: serviceId, active: true });
+            // 1. Verify service validity (Handle both actual service ObjectIds or category slugs)
+            let service;
+            if (mongoose_1.default.Types.ObjectId.isValid(serviceId)) {
+                service = await Service_1.ServiceModel.findOne({ _id: serviceId, active: true });
+            }
+            else {
+                let category = await Category_1.CategoryModel.findOne({ slug: serviceId });
+                if (!category) {
+                    // Auto-create category if it doesn't exist in the database
+                    category = await Category_1.CategoryModel.create({
+                        name: serviceName || serviceId,
+                        slug: serviceId,
+                        icon: "Wrench"
+                    });
+                }
+                service = await Service_1.ServiceModel.findOne({ categoryId: category._id, active: true });
+                if (!service) {
+                    // Auto-create service under this category if it doesn't exist
+                    service = await Service_1.ServiceModel.create({
+                        categoryId: category._id,
+                        title: serviceName || `${category.name} Service`,
+                        description: `Professional ${serviceName || category.name} service.`,
+                        duration: 60,
+                        basePrice: price ? Number(price) : 199,
+                        active: true
+                    });
+                }
+            }
             if (!service)
                 return next(new AppError_1.AppError("Service is not available or inactive.", 404));
-            // 2. Fetch address coordinates
-            const address = await Address_1.AddressModel.findOne({ _id: addressId, userId: customerId });
+            const finalServiceId = service._id;
+            // 2. Fetch or create address
+            let resolvedAddressId = addressId;
+            if (!resolvedAddressId && addressData) {
+                const newAddress = await Address_1.AddressModel.create({
+                    userId: customerId,
+                    houseNo: addressData.houseNo || "N/A",
+                    street: addressData.street || "N/A",
+                    landmark: addressData.landmark || "",
+                    city: addressData.city || "Hosur",
+                    state: addressData.state || "Tamil Nadu",
+                    pincode: addressData.pincode || "635109",
+                    location: addressData.location || { type: "Point", coordinates: [77.8270, 12.7409] },
+                    isDefault: false
+                });
+                resolvedAddressId = newAddress._id;
+            }
+            const address = await Address_1.AddressModel.findOne({ _id: resolvedAddressId, userId: customerId });
             if (!address)
                 return next(new AppError_1.AppError("Invalid or unauthorized address choice.", 404));
             // 3. Compute billing invoice
             const materials = parseFloat(materialCharges || "0");
-            const pricing = await bookingEngine_1.BookingEngine.calculatePrice(serviceId, bookingDate, bookingTime, materials, couponCode);
+            const pricing = await bookingEngine_1.BookingEngine.calculatePrice(finalServiceId.toString(), bookingDate, bookingTime, materials, couponCode);
             // 4. Generate unique Booking Number
             const randomSuffix = Math.floor(1000 + Math.random() * 9000);
             const cleanDate = bookingDate.replace(/-/g, "");
@@ -114,8 +162,8 @@ class BookingController {
             const booking = await Booking_1.BookingModel.create({
                 bookingNumber,
                 customerId,
-                serviceId,
-                addressId,
+                serviceId: finalServiceId,
+                addressId: resolvedAddressId,
                 bookingDate,
                 bookingTime,
                 status: "PENDING",
@@ -124,9 +172,11 @@ class BookingController {
             });
             logger_1.logger.info(`Booking created: ${booking.bookingNumber} for Customer: ${customerId}`);
             // 6. Trigger Asynchronous Matchmaking Dispatch Loop
-            bookingEngine_1.BookingEngine.dispatchBookingRequest(booking._id.toString(), service.categoryId.toString(), address.location.coordinates[1], // latitude
-            address.location.coordinates[0], // longitude
-            bookingDate, bookingTime).catch((err) => logger_1.logger.error("Matchmaker failure after booking create:", err));
+            const categoryIdStr = service.categoryId.toString();
+            const location = address.location?.coordinates || [77.8270, 12.7409];
+            const customerLon = location[0];
+            const customerLat = location[1];
+            bookingEngine_1.BookingEngine.dispatchBookingRequest(booking._id.toString(), categoryIdStr, customerLat, customerLon, bookingDate, bookingTime).catch((err) => logger_1.logger.error("Matchmaker failure after booking create:", err));
             res.status(201).json({
                 success: true,
                 message: "Booking request submitted. Finding nearest technician...",

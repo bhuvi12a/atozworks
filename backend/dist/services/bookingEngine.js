@@ -73,11 +73,20 @@ class BookingEngine {
         const bookingDate = new Date(bookingDateStr);
         const dayOfWeek = bookingDate.getDay();
         // 2. Fetch all verified providers matching category
-        const providers = await Provider_1.ProviderModel.find({
+        let providers = await Provider_1.ProviderModel.find({
             verificationStatus: "VERIFIED",
             kycStatus: "APPROVED",
             categories: categoryId,
         }).populate("userId");
+        // Fallback: If no providers have this specific category (e.g. it was auto-created),
+        // find any verified provider to ensure the booking can be fulfilled.
+        if (providers.length === 0) {
+            logger_1.logger.warn(`No providers found for category ${categoryId}, falling back to all verified providers`);
+            providers = await Provider_1.ProviderModel.find({
+                verificationStatus: "VERIFIED",
+                kycStatus: "APPROVED",
+            }).populate("userId");
+        }
         const matches = [];
         for (const provider of providers) {
             // Validate service availability schedule

@@ -8,7 +8,6 @@ const auth_1 = __importDefault(require("./auth"));
 const user_1 = __importDefault(require("./user"));
 const provider_1 = __importDefault(require("./provider"));
 const booking_1 = __importDefault(require("./booking"));
-const payment_1 = __importDefault(require("./payment"));
 const review_1 = __importDefault(require("./review"));
 const admin_1 = __importDefault(require("./admin"));
 const router = (0, express_1.Router)();
@@ -17,7 +16,6 @@ router.use("/auth", auth_1.default);
 router.use("/users", user_1.default);
 router.use("/providers", provider_1.default);
 router.use("/bookings", booking_1.default);
-router.use("/payments", payment_1.default);
 router.use("/reviews", review_1.default);
 router.use("/admin", admin_1.default);
 // Health check endpoint

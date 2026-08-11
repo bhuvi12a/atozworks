@@ -7,7 +7,6 @@ const User_1 = require("../models/User");
 const Service_1 = require("../models/Service");
 const Coupon_1 = require("../models/Coupon");
 const Category_1 = require("../models/Category");
-const paymentService_1 = require("../services/paymentService");
 const AppError_1 = require("../utils/AppError");
 const logger_1 = require("../utils/logger");
 class AdminController {
@@ -100,11 +99,15 @@ class AdminController {
             if (!bookingId) {
                 return next(new AppError_1.AppError("Booking ID is required.", 400));
             }
-            const refundResult = await paymentService_1.PaymentService.processRefund(bookingId);
+            // Pay After Service model: Just mark the booking as refunded/cancelled
+            const booking = await Booking_1.BookingModel.findByIdAndUpdate(bookingId, { paymentStatus: "REFUNDED", status: "REFUNDED" }, { new: true });
+            if (!booking) {
+                return next(new AppError_1.AppError("Booking not found.", 404));
+            }
             res.status(200).json({
                 success: true,
-                message: "Refund issued successfully.",
-                refund: refundResult,
+                message: "Refund processed successfully.",
+                booking,
             });
         }
         catch (error) {

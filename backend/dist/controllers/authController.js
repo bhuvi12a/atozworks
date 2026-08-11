@@ -54,7 +54,7 @@ const generateTokenPair = (userId, email, role) => {
     const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "jwt_access_secret_token";
     const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "jwt_refresh_secret_token";
     const accessToken = jsonwebtoken_1.default.sign({ id: userId, email, role }, JWT_ACCESS_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "30d",
     });
     const refreshToken = jsonwebtoken_1.default.sign({ id: userId }, JWT_REFRESH_SECRET, {
         expiresIn: "7d",

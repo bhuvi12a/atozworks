@@ -150,9 +150,14 @@ export default function NewBookingScreen({ route, navigation }) {
             }),
           });
         } else {
-          // Refresh token is also expired, force re-login
+          // Both tokens expired - clear session and redirect to login
+          setLoading(false);
           await AsyncStorage.removeItem('@atoz_user_session');
-          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+          Alert.alert(
+            'Session Expired',
+            'Your session has expired. Please log in again.',
+            [{ text: 'Log In', onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] }) }]
+          );
           return;
         }
       }
