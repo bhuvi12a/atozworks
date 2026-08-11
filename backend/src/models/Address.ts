@@ -20,14 +20,14 @@ const AddressSchema = new Schema<IAddress>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     houseNo: { type: String, required: true },
-    street: { type: String, required: true },
+    street: { type: String, default: '' },
     landmark: { type: String },
     city: { type: String, required: true },
     state: { type: String, required: true },
     pincode: { type: String, required: true },
     location: {
       type: { type: String, enum: ["Point"], default: "Point", required: true },
-      coordinates: { type: [Number], required: true }, // [longitude, latitude]
+      coordinates: { type: [Number], required: true, default: [77.8270, 12.7409] }, // [longitude, latitude] — default: Hosur
     },
     isDefault: { type: Boolean, default: false },
   },

@@ -147,12 +147,15 @@ export class BookingController {
         const newAddress = await AddressModel.create({
           userId: customerId,
           houseNo: addressData.houseNo || "N/A",
-          street: addressData.street || "N/A",
+          street: addressData.street || "",
           landmark: addressData.landmark || "",
           city: addressData.city || "Hosur",
           state: addressData.state || "Tamil Nadu",
           pincode: addressData.pincode || "635109",
-          location: addressData.location || { type: "Point", coordinates: [77.8270, 12.7409] },
+          // Always fall back to Hosur coordinates if no GPS was provided
+          location: (addressData.location?.coordinates?.length === 2)
+            ? addressData.location
+            : { type: "Point", coordinates: [77.8270, 12.7409] },
           isDefault: false
         });
         resolvedAddressId = newAddress._id;
