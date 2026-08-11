@@ -87,7 +87,7 @@ export default function NewBookingScreen({ route, navigation }) {
       }
 
       // 1. Create Booking on Backend
-      const bookingRes = await fetch(`${API_URL}/bookings`, {
+      let bookingRes = await fetch(`${API_URL}/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,6 +110,52 @@ export default function NewBookingScreen({ route, navigation }) {
           }
         }),
       });
+
+      // Token Refresh Fallback
+      if (bookingRes.status === 401 && session?.refreshToken) {
+        const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken: session.refreshToken })
+        });
+        
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          session.accessToken = refreshData.tokens.accessToken;
+          session.refreshToken = refreshData.tokens.refreshToken;
+          await AsyncStorage.setItem('@atoz_user_session', JSON.stringify(session));
+          
+          // Retry the booking request with the new access token
+          bookingRes = await fetch(`${API_URL}/bookings`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.accessToken}`
+            },
+            body: JSON.stringify({
+              serviceId: service.slug,
+              serviceName: service.name,
+              price: service.price ? parseInt(service.price.replace(/[^0-9]/g, '')) : 0,
+              bookingDate: selectedDate,
+              bookingTime: selectedSlot.split(' ')[0],
+              address: {
+                houseNo: address,
+                street: '',
+                landmark: '',
+                city: 'Hosur',
+                state: 'Tamil Nadu',
+                pincode: '635109',
+                location: lat && lng ? { type: 'Point', coordinates: [lng, lat] } : undefined
+              }
+            }),
+          });
+        } else {
+          // Refresh token is also expired, force re-login
+          await AsyncStorage.removeItem('@atoz_user_session');
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+          return;
+        }
+      }
 
       const bookingData = await bookingRes.json();
       if (!bookingRes.ok) throw new Error(bookingData.message || 'Failed to create booking');
