@@ -62,15 +62,15 @@ export default function ProfileScreen({ navigation }) {
     },
     {
       icon: FileText, label: 'Terms of Service', color: '#6366f1',
-      onPress: () => Linking.openURL('https://atozworks.in/terms')
+      onPress: () => Linking.openURL('https://atozworks.co/terms')
     },
     {
       icon: Shield, label: 'Privacy Policy', color: '#10b981',
-      onPress: () => Linking.openURL('https://atozworks.in/privacy')
+      onPress: () => Linking.openURL('https://atozworks.co/privacy')
     },
     {
       icon: Star, label: 'Rate the App', color: '#f59e0b',
-      onPress: () => Linking.openURL('https://play.google.com/store/apps/details?id=com.atozworks.app')
+      onPress: () => Linking.openURL('market://details?id=com.atozworks.app').catch(() => Linking.openURL('https://play.google.com/store/apps/details?id=com.atozworks.app'))
     },
     {
       icon: Headphones, label: 'Call Support', color: '#ef4444',
@@ -164,7 +164,7 @@ export default function ProfileScreen({ navigation }) {
         </View>
 
         {/* App Version */}
-        <Text style={styles.versionText}>AtoZ Works v1.0.0 · Made in India 🇮🇳</Text>
+        <Text style={styles.versionText}>AtoZ Works v1.0.0</Text>
         <Text style={styles.developerText}>Developed by booworks.co</Text>
 
         {/* Logout */}

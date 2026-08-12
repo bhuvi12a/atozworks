@@ -28,8 +28,6 @@ export const adminAuth = (req: Request, _res: Response, next: NextFunction) => {
   // Accept the main password and legacy fallback for backwards compat
   const validPasswords = [
     ADMIN_SECRET,
-    "admin1234",
-    "AtoZWorks@Admin2026!",
   ];
 
   if (!validPasswords.includes(submitted)) {

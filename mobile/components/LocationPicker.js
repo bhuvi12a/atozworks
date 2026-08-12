@@ -581,29 +581,6 @@ export default function LocationPicker({ onLocationSelect, initialAddress = '', 
           </View>
         ) : null}
 
-        {/* Popular Locations Quick Select */}
-        <Text style={styles.quickAreaLabel}>Popular Hosur & Tamil Nadu Locations:</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.areaScroll}>
-          {TAMILNADU_LOCALITIES.slice(0, 15).map((area) => {
-            const isSelected = areaAddress === area;
-            return (
-              <TouchableOpacity
-                key={area}
-                style={[styles.areaChip, isSelected && styles.areaChipSelected]}
-                onPress={() => {
-                  setAreaAddress(area);
-                  setSearchQuery(area);
-                  setShowDropdown(false);
-                  updateParentAddress(houseNo, landmark, area);
-                }}
-              >
-                <Text style={[styles.areaChipText, isSelected && styles.areaChipTextSelected]}>
-                  {area}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
       </View>
     </View>
   );

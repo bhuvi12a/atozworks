@@ -321,6 +321,19 @@ ${mapsPinUrl}`;
           })}
         </View>
 
+        <View style={[styles.inputCard, { marginTop: 10 }]}>
+          <View style={[styles.inputContainer, { borderBottomWidth: 0 }]}>
+            <Clock size={16} color="#64748b" style={styles.inputIcon} />
+            <TextInput
+              placeholder="Or enter custom time (e.g. 04:30 PM)"
+              placeholderTextColor="#94a3b8"
+              style={styles.textInput}
+              value={!TIME_SLOTS.includes(selectedSlot) ? selectedSlot : ''}
+              onChangeText={setSelectedSlot}
+            />
+          </View>
+        </View>
+
         {/* Address & Location Picker */}
         <Text style={styles.sectionTitle}>Service Address</Text>
         <LocationPicker initialAddress={initialAddress} onLocationSelect={(loc, details) => {

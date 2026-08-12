@@ -185,9 +185,6 @@ export default function BookingsScreen({ navigation }) {
             <User size={12} color="#00a8e8" />
             <Text style={styles.userPhone}>+91 {loggedInPhone}</Text>
           </View>
-          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-            <LogOut size={16} color="#ef4444" />
-          </TouchableOpacity>
         </View>
       </View>
 

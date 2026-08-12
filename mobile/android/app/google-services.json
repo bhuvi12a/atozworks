@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059359716424",
+    "project_id": "atozworks-82c0b",
+    "storage_bucket": "atozworks-82c0b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059359716424:android:5d36021822cba9f860947d",
+        "android_client_info": {
+          "package_name": "com.atozworks.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDegt82niNloAtPjAGjzSHzNST-ufF8UIc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

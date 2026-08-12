@@ -29,7 +29,7 @@ const MOCK_ANALYTICS = {
 
 // Removed MOCK data for production
 // Admin panel credentials — must match ADMIN_SECRET in backend/.env
-const ADMIN_PASSWORD = "AtoZWorks@Admin2026!";
+const ADMIN_PASSWORD = "1234";
 const ADMIN_HEADERS = {
   "Content-Type": "application/json",
   "X-Admin-Password": ADMIN_PASSWORD,
@@ -75,8 +75,7 @@ export default function AdminPanel() {
     setAuthLoading(true);
     setAuthError("");
     try {
-      const hashed = await hashPassword(password);
-      if (password === "AtoZWorks@Admin2026!" || hashed === "c66c75f960f598f862daf49a4b79596267cdc1c9c54a5a053d7f6fd7858d630e") {
+      if (password === ADMIN_PASSWORD) {
         sessionStorage.setItem("atozworks_admin_auth", "true");
         setIsAuthenticated(true);
       } else {

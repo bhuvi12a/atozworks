@@ -266,19 +266,17 @@ export default function LoginScreen({ navigation }) {
 
                 <View style={styles.trustRow}>
                   <Text style={styles.trustText}>🔒 End-to-end encrypted</Text>
-                  <Text style={styles.trustDot}>·</Text>
-                  <Text style={styles.trustText}>🇮🇳 Made in India</Text>
                 </View>
 
                 <Text style={styles.termsText}>
                   By continuing, you agree to our{' '}
                   <Text style={styles.termsLink}
-                    onPress={() => Linking.openURL('https://atozworks.in/terms')}>
+                    onPress={() => Linking.openURL('https://atozworks.co/terms')}>
                     Terms of Service
                   </Text>
                   {' '}and{' '}
                   <Text style={styles.termsLink}
-                    onPress={() => Linking.openURL('https://atozworks.in/privacy')}>
+                    onPress={() => Linking.openURL('https://atozworks.co/privacy')}>
                     Privacy Policy
                   </Text>
                 </Text>
