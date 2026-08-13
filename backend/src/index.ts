@@ -53,6 +53,26 @@ app.get("/delete-account", (_req, res) => {
   `);
 });
 
+app.get("/privacy-policy", (_req, res) => {
+  res.send(`
+    <html lang="en">
+      <head><title>Privacy Policy | AtoZ Works</title></head>
+      <body style="font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: auto; line-height: 1.6; color: #333;">
+        <h2>Privacy Policy for AtoZ Works</h2>
+        <p><strong>Last Updated: August 2026</strong></p>
+        <p>AtoZ Works respects your privacy and is committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website or use our application.</p>
+        <h3>1. The Data We Collect</h3>
+        <p>We may collect, use, store and transfer different kinds of personal data about you, including your name, phone number, address, and booking history.</p>
+        <h3>2. How We Use Your Data</h3>
+        <p>We use your data to provide home services, communicate with you, and improve our platform.</p>
+        <h3>3. Data Security</h3>
+        <p>We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorised way.</p>
+        <p>If you have any questions about this privacy policy, please contact us at <strong>support@atozworks.in</strong>.</p>
+      </body>
+    </html>
+  `);
+});
+
 // 4. API Gateway Routing
 app.use("/api/v1", apiRouter);
 
