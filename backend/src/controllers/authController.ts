@@ -299,6 +299,16 @@ export class AuthController {
         ? Math.floor(100000 + Math.random() * 900000).toString() 
         : DEV_OTP;
 
+      // ── Google Play Review Test Account Bypass ──────────────────────────────
+      if (clean === "9999999999") {
+        await safeRedisSet(`otp:${clean}`, "123456", 10 * 60);
+        res.status(200).json({
+          success: true,
+          message: "OTP sent successfully (Test Account Bypass).",
+        });
+        return;
+      }
+
       // Store in Redis (valid for 10 mins)
       await safeRedisSet(`otp:${clean}`, generatedOtp, 10 * 60);
 
