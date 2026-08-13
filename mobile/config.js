@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 // 192.168.88.4 is the local IP of your development computer.
 const getApiUrl = () => {
   if (__DEV__) {
-    return 'http://192.168.88.20:5000/api/v1';
+    return 'http://192.168.88.4:5000/api/v1';
   }
   // Production URL (Render Live Backend)
   return 'https://atozworks-2.onrender.com/api/v1'; 

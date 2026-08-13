@@ -592,9 +592,9 @@ export default function Home() {
               © {new Date().getFullYear()} AtoZ Works. All rights reserved.
             </div>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6 font-medium">
-              <a href="#" className="hover:text-[#0088ff] transition">Privacy Policy</a>
-              <a href="#" className="hover:text-[#0088ff] transition">Terms of Service</a>
-              <a href="#" className="hover:text-[#0088ff] transition">Refund Policy</a>
+              <Link href="/privacy-policy" className="hover:text-[#0088ff] transition">Privacy Policy</Link>
+              <Link href="/terms-and-conditions" className="hover:text-[#0088ff] transition">Terms of Service</Link>
+              <Link href="/refund-policy" className="hover:text-[#0088ff] transition">Refund Policy</Link>
               <a href="tel:+919360651833" className="hover:text-[#0088ff] transition">Support Hotline</a>
             </div>
           </div>
