@@ -30,11 +30,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 3. Static Web Routes (for Google Play compliance and Health Checks)
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.send("AtoZ Works Backend API is running.");
 });
 
-app.get("/delete-account", (req, res) => {
+app.get("/delete-account", (_req, res) => {
   res.send(`
     <html lang="en">
       <head><title>Delete Account | AtoZ Works</title></head>
