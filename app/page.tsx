@@ -595,6 +595,7 @@ export default function Home() {
               <Link href="/privacy-policy" className="hover:text-[#0088ff] transition">Privacy Policy</Link>
               <Link href="/terms-and-conditions" className="hover:text-[#0088ff] transition">Terms of Service</Link>
               <Link href="/refund-policy" className="hover:text-[#0088ff] transition">Refund Policy</Link>
+              <Link href="/delete-account" className="hover:text-[#0088ff] transition">Delete Account</Link>
               <a href="tel:+919360651833" className="hover:text-[#0088ff] transition">Support Hotline</a>
             </div>
           </div>

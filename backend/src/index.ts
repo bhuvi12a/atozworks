@@ -29,7 +29,31 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. API Gateway Routing
+// 3. Static Web Routes (for Google Play compliance and Health Checks)
+app.get("/", (req, res) => {
+  res.send("AtoZ Works Backend API is running.");
+});
+
+app.get("/delete-account", (req, res) => {
+  res.send(`
+    <html lang="en">
+      <head><title>Delete Account | AtoZ Works</title></head>
+      <body style="font-family: Arial, sans-serif; padding: 40px; max-width: 600px; margin: auto; line-height: 1.6; color: #333;">
+        <h2 style="color: #d9534f;">Request Account Deletion</h2>
+        <p>At AtoZ Works, we respect your privacy.</p>
+        <p>To permanently delete your account and all associated data from our servers, please send an email to <strong>support@atozworks.in</strong>.</p>
+        <p><strong>Please include:</strong></p>
+        <ul>
+          <li>The phone number associated with your account</li>
+          <li>A brief statement that you wish to delete your account</li>
+        </ul>
+        <p>Our team will process your deletion securely within 7-14 business days.</p>
+      </body>
+    </html>
+  `);
+});
+
+// 4. API Gateway Routing
 app.use("/api/v1", apiRouter);
 
 // 4. Fallback for unhandled endpoints
